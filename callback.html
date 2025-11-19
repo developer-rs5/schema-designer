@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback</title>
+</head>
+<body>
+    <div id="zenux-oauth-callback-container"></div>
+
+<script src="https://unpkg.com/zenuxs-oauth@2.0.2/dist/zenux-oauth.min.js"></script>
+    <script>
+        if (window.zenuxOAuthCallback) {
+            console.log("Callback handler initialized automatically");
+        } else {
+            window.zenuxOAuthCallback = new ZenuxOAuthCallbackHandler({
+                debug: true,
+                autoClose: true,
+                autoCloseDelay: 1000,
+                homeUrl: "/login.html", 
+                storagePrefix: "zenux_oauth_",
+                successMessage: "Authentication successful! Redirecting...",
+                errorMessage: "Authentication failed. Please try again."
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Easy-Mongoo Schema Designer Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0d0d0d;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #151515;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4c8bff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #fff;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #3a6bd6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Zenuxs Login</h1>
+        <p>Login first with your Zenuxs account to start using this Easy-Mongoo Schema Designer for free.</p>
+        <button onclick="login()">Login</button>
+    </div>
+    <script src="https://unpkg.com/zenuxs-oauth@2.0.2/dist/zenux-oauth.min.js"></script>
+    <script>
+        const oauth = new ZenuxOAuth({
+            clientId: "6e2e7cddffeb77de",
+            authServer: "https://api.auth.zenuxs.in",
+            redirectUri: "http://localhost:5500/callback.html",
+            scopes: "openid profile email",
+            storage: "sessionStorage",
+            autoRefresh: true,
+            debug: true
+        });
+        async function login() {
+            const tokens = await oauth.login({ popup: true });
+        }
+        async function get(){
+            const user = await oauth.getUserInfo()
+        }
+        
+    </script>
+</body>
+
+</html>

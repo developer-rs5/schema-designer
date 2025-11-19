@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Schema Designer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .toolbar {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 12px 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .toolbar button {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .toolbar button:hover {
+            background: #2ea043;
+        }
+
+        .toolbar button.secondary {
+            background: #21262d;
+            border: 1px solid #30363d;
+        }
+
+        .toolbar button.secondary:hover {
+            background: #30363d;
+        }
+
+        .toolbar .separator {
+            width: 1px;
+            height: 24px;
+            background: #30363d;
+        }
+
+        .toolbar .title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-right: auto;
+            color: #58a6ff;
+        }
+
+        .canvas-container {
+            width: 100vw;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            background:
+                linear-gradient(#1a1f26 1px, transparent 1px),
+                linear-gradient(90deg, #1a1f26 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: 0 0;
+        }
+
+        .canvas-container.grabbing {
+            cursor: grabbing;
+        }
+
+        .canvas {
+            position: absolute;
+            transform-origin: 0 0;
+            width: 10000px;
+            height: 10000px;
+        }
+
+        .connections-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .schema-box {
+            position: absolute;
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            min-width: 350px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: box-shadow 0.2s;
+            z-index: 1;
+        }
+
+        .schema-box.selected {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
+        }
+
+        .schema-header {
+            background: #21262d;
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .schema-header input {
+            background: transparent;
+            border: none;
+            color: #58a6ff;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            width: 100%;
+        }
+
+        .schema-header .delete-btn {
+            background: #da3633;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .schema-body {
+            padding: 12px;
+        }
+
+        .field-item {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .field-item.highlighted {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
+        }
+
+        .field-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .field-item input,
+        .field-item select {
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+        }
+
+        .field-item input:focus,
+        .field-item select:focus {
+            border-color: #58a6ff;
+        }
+
+        .field-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .ref-select {
+            grid-column: 1 / -1;
+            margin-top: 4px;
+        }
+
+        .remove-field {
+            background: #da3633;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .remove-field:hover {
+            background: #f85149;
+        }
+
+        .add-field-btn {
+            width: 100%;
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .add-field-btn:hover {
+            background: #2ea043;
+        }
+
+        .timestamp-toggle {
+            width: 100%;
+            background: #1f6feb;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .timestamp-toggle:hover {
+            background: #388bfd;
+        }
+
+        .timestamp-toggle.active {
+            background: #2ea043;
+        }
+
+        .connection-line {
+            stroke-width: 2.5;
+            fill: none;
+            cursor: pointer;
+            transition: stroke-width 0.2s;
+        }
+
+        .connection-line:hover {
+            stroke-width: 4;
+        }
+
+        .connection-line.highlighted {
+            stroke-width: 4;
+            filter: drop-shadow(0 0 6px currentColor);
+        }
+
+        .context-menu {
+            position: fixed;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            min-width: 200px;
+        }
+
+        .context-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .context-menu-item:hover {
+            background: #21262d;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: #30363d;
+            margin: 4px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content h2 {
+            color: #58a6ff;
+            margin-bottom: 16px;
+        }
+
+        .modal-content pre {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            color: #c9d1d9;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .modal-close {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .zoom-controls button {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .zoom-level {
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            color: #58a6ff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .default-input {
+            margin-top: 4px;
+        }
+
+        .field-options-dropdown {
+            margin-top: 8px;
+            padding: 8px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+        }
+
+        .field-options-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        .field-options-header span {
+            font-size: 12px;
+            color: #8b949e;
+            font-weight: 600;
+        }
+
+        .field-options-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .field-options-content.collapsed {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toolbar">
+        <div class="title">🍃 MongoDB Schema Designer</div>
+        <button onclick="addSchema()">+ New Schema</button>
+        <button class="secondary" onclick="exportSchema()">Export JSON</button>
+        <button class="secondary" onclick="exportMongoose()">Export Mongoose</button>
+        <button class="secondary" onclick="clearCanvas()">Clear All</button>
+        <div class="separator"></div>
+        <button class="secondary" onclick="resetView()">Reset View</button>
+    </div>
+
+    <div class="canvas-container" id="canvasContainer">
+        <div class="canvas" id="canvas">
+            <svg class="connections-svg" id="connectionsSvg"></svg>
+        </div>
+    </div>
+
+    <div class="zoom-controls">
+        <button onclick="zoomOut()">−</button>
+        <div class="zoom-level" id="zoomLevel">100%</div>
+        <button onclick="zoomIn()">+</button>
+    </div>
+
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h2>Exported Schema</h2>
+            <pre id="exportContent"></pre>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let schemas = [];
+        let selectedSchema = null;
+        let draggedSchema = null;
+        let dragOffset = { x: 0, y: 0 };
+        let isPanning = false;
+        let panStart = { x: 0, y: 0 };
+        let canvasOffset = { x: 0, y: 0 };
+        let zoom = 1;
+        let schemaIdCounter = 0;
+        let highlightedField = null;
+
+        const canvas = document.getElementById('canvas');
+        const canvasContainer = document.getElementById('canvasContainer');
+        const connectionsSvg = document.getElementById('connectionsSvg');
+
+        const fieldTypes = [
+            'String', 'Number', 'Boolean', 'Date', 'ObjectId',
+            'Array', 'Mixed', 'Buffer', 'Decimal128', 'Map'
+        ];
+
+        const fieldColors = {
+            'String': '#58a6ff',
+            'Number': '#3fb950',
+            'Boolean': '#d29922',
+            'Date': '#bc8cff',
+            'ObjectId': '#f85149',
+            'Array': '#79c0ff',
+            'Mixed': '#ffa657',
+            'Buffer': '#d2a8ff',
+            'Decimal128': '#56d364',
+            'Map': '#ff7b72'
+        };
+
+        function addSchema(x = 100, y = 100) {
+            const schema = {
+                id: schemaIdCounter++,
+                name: `Schema${schemaIdCounter}`,
+                x: x,
+                y: y,
+                timestamps: false,
+                fields: [
+                    {
+                        name: '_id',
+                        type: 'ObjectId',
+                        required: true,
+                        unique: true,
+                        ref: '',
+                        default: ''
+                    }
+                ]
+            };
+
+            schemas.push(schema);
+            renderSchema(schema);
+            updateConnections();
+        }
+
+        function renderSchema(schema) {
+            const box = document.createElement('div');
+            box.className = 'schema-box';
+            box.id = `schema-${schema.id}`;
+            box.style.left = schema.x + 'px';
+            box.style.top = schema.y + 'px';
+
+            box.innerHTML = `
+                <div class="schema-header">
+                    <input type="text" value="${schema.name}" onchange="updateSchemaName(${schema.id}, this.value)">
+                    <button class="delete-btn" onclick="deleteSchema(${schema.id})">×</button>
+                </div>
+                <div class="schema-body" id="schema-body-${schema.id}">
+                    ${renderFields(schema)}
+                    <button class="add-field-btn" onclick="addField(${schema.id})">+ Add Field</button>
+                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schema.id})">
+                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                    </button>
+                </div>
+            `;
+
+            // Make schema draggable
+            const header = box.querySelector('.schema-header');
+            header.addEventListener('mousedown', startDrag);
+
+            function startDrag(e) {
+                if (e.button !== 0) return; // Only left click
+                selectedSchema = schema;
+                draggedSchema = schema;
+                
+                document.querySelectorAll('.schema-box').forEach(b => b.classList.remove('selected'));
+                box.classList.add('selected');
+                
+                const rect = box.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                
+                e.preventDefault();
+            }
+
+            canvas.appendChild(box);
+        }
+
+        function renderFields(schema) {
+            return schema.fields.map((field, index) => {
+                const showRef = field.type === 'ObjectId' || (field.type === 'Array' && field.ref);
+                return `
+                <div class="field-item" id="field-${schema.id}-${index}" 
+                     onclick="highlightFieldConnections(${schema.id}, ${index})"
+                     style="border-left: 3px solid ${fieldColors[field.type] || '#30363d'}">
+                    <div class="field-main-row">
+                        <input type="text" value="${field.name}" placeholder="Field name" 
+                               onchange="updateField(${schema.id}, ${index}, 'name', this.value)">
+                        <select onchange="updateField(${schema.id}, ${index}, 'type', this.value)">
+                            ${fieldTypes.map(type => `
+                                <option value="${type}" ${field.type === type ? 'selected' : ''}>${type}</option>
+                            `).join('')}
+                        </select>
+                        ${field.name !== '_id' ? `<button class="remove-field" onclick="event.stopPropagation(); removeField(${schema.id}, ${index})">×</button>` : '<span></span>'}
+                    </div>
+                    
+                    <div class="field-options-dropdown">
+                        <div class="field-options-header" onclick="event.stopPropagation(); toggleFieldOptions(${schema.id}, ${index})">
+                            <span>Field Options</span>
+                            <span id="field-options-arrow-${schema.id}-${index}">▶</span>
+                        </div>
+                        <div class="field-options-content collapsed" id="field-options-${schema.id}-${index}">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="req-${schema.id}-${index}" 
+                                       ${field.required ? 'checked' : ''}
+                                       onchange="updateField(${schema.id}, ${index}, 'required', this.checked)">
+                                <label for="req-${schema.id}-${index}">Required</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="uniq-${schema.id}-${index}" 
+                                       ${field.unique ? 'checked' : ''}
+                                       onchange="updateField(${schema.id}, ${index}, 'unique', this.checked)">
+                                <label for="uniq-${schema.id}-${index}">Unique</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="index-${schema.id}-${index}" 
+                                       ${field.index ? 'checked' : ''}
+                                       onchange="updateField(${schema.id}, ${index}, 'index', this.checked)">
+                                <label for="index-${schema.id}-${index}">Indexed</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="sparse-${schema.id}-${index}" 
+                                       ${field.sparse ? 'checked' : ''}
+                                       onchange="updateField(${schema.id}, ${index}, 'sparse', this.checked)">
+                                <label for="sparse-${schema.id}-${index}">Sparse</label>
+                            </div>
+                            ${showRef ? `
+                            <select class="ref-select" style="grid-column: 1 / -1;" onchange="updateField(${schema.id}, ${index}, 'ref', this.value)">
+                                <option value="">No Reference</option>
+                                ${schemas.filter(s => s.id !== schema.id).map(s => `
+                                    <option value="${s.name}" ${field.ref === s.name ? 'selected' : ''}>${s.name}</option>
+                                `).join('')}
+                            </select>` : ''}
+                            <input type="text" style="grid-column: 1 / -1;" placeholder="Default value" 
+                                   value="${field.default || ''}"
+                                   onchange="updateField(${schema.id}, ${index}, 'default', this.value)">
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+        function toggleFieldOptions(schemaId, fieldIndex) {
+            const optionsContent = document.getElementById(`field-options-${schemaId}-${fieldIndex}`);
+            const arrow = document.getElementById(`field-options-arrow-${schemaId}-${fieldIndex}`);
+            
+            if (optionsContent.classList.contains('collapsed')) {
+                optionsContent.classList.remove('collapsed');
+                arrow.textContent = '▼';
+            } else {
+                optionsContent.classList.add('collapsed');
+                arrow.textContent = '▶';
+            }
+        }
+
+        function updateSchemaName(id, name) {
+            const schema = schemas.find(s => s.id === id);
+            if (schema) {
+                schema.name = name;
+                // Update all references to this schema
+                schemas.forEach(s => {
+                    s.fields.forEach(f => {
+                        if (f.ref === schema.name) {
+                            const body = document.getElementById(`schema-body-${s.id}`);
+                            if (body) {
+                                body.innerHTML = renderFields(s) +
+                                    `<button class="add-field-btn" onclick="addField(${s.id})">+ Add Field</button>
+                                    <button class="timestamp-toggle ${s.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${s.id})">
+                                        ${s.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                                    </button>`;
+                            }
+                        }
+                    });
+                });
+                updateConnections();
+            }
+        }
+
+        function addField(schemaId) {
+            const schema = schemas.find(s => s.id === schemaId);
+            if (schema) {
+                schema.fields.push({
+                    name: 'newField',
+                    type: 'String',
+                    required: false,
+                    unique: false,
+                    index: false,
+                    sparse: false,
+                    ref: '',
+                    default: ''
+                });
+                const body = document.getElementById(`schema-body-${schemaId}`);
+                body.innerHTML = renderFields(schema) +
+                    `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
+                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
+                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                    </button>`;
+                updateConnections();
+            }
+        }
+
+        function updateField(schemaId, fieldIndex, prop, value) {
+            const schema = schemas.find(s => s.id === schemaId);
+            if (schema && schema.fields[fieldIndex]) {
+                schema.fields[fieldIndex][prop] = value;
+
+                if (prop === 'type' || prop === 'ref') {
+                    const body = document.getElementById(`schema-body-${schemaId}`);
+                    body.innerHTML = renderFields(schema) +
+                        `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
+                        <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
+                            ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                        </button>`;
+                    updateConnections();
+                }
+            }
+        }
+
+        function removeField(schemaId, fieldIndex) {
+            const schema = schemas.find(s => s.id === schemaId);
+            if (schema) {
+                schema.fields.splice(fieldIndex, 1);
+                const body = document.getElementById(`schema-body-${schemaId}`);
+                body.innerHTML = renderFields(schema) +
+                    `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
+                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
+                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                    </button>`;
+                updateConnections();
+            }
+        }
+
+        function toggleTimestamps(schemaId) {
+            const schema = schemas.find(s => s.id === schemaId);
+            if (schema) {
+                schema.timestamps = !schema.timestamps;
+                const body = document.getElementById(`schema-body-${schemaId}`);
+                body.innerHTML = renderFields(schema) +
+                    `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
+                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
+                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                    </button>`;
+            }
+        }
+
+        function deleteSchema(id) {
+            schemas = schemas.filter(s => s.id !== id);
+            const box = document.getElementById(`schema-${id}`);
+            if (box) box.remove();
+            updateConnections();
+        }
+
+        function clearCanvas() {
+            if (confirm('Are you sure you want to clear all schemas?')) {
+                schemas = [];
+                canvas.innerHTML = '<svg class="connections-svg" id="connectionsSvg"></svg>';
+            }
+        }
+
+        function highlightFieldConnections(schemaId, fieldIndex) {
+            const schema = schemas.find(s => s.id === schemaId);
+            const field = schema.fields[fieldIndex];
+
+            // Clear previous highlights
+            document.querySelectorAll('.field-item').forEach(el => el.classList.remove('highlighted'));
+            document.querySelectorAll('.connection-line').forEach(el => el.classList.remove('highlighted'));
+
+            if (highlightedField && highlightedField.schemaId === schemaId && highlightedField.fieldIndex === fieldIndex) {
+                highlightedField = null;
+                return;
+            }
+
+            highlightedField = { schemaId, fieldIndex };
+
+            // Highlight current field
+            const currentFieldEl = document.getElementById(`field-${schemaId}-${fieldIndex}`);
+            if (currentFieldEl) currentFieldEl.classList.add('highlighted');
+
+            // Find and highlight all connected fields
+            schemas.forEach(s => {
+                s.fields.forEach((f, fIdx) => {
+                    if (f.ref === schema.name) {
+                        const fieldEl = document.getElementById(`field-${s.id}-${fIdx}`);
+                        if (fieldEl) fieldEl.classList.add('highlighted');
+
+                        // Highlight connection line
+                        const lineId = `line-${s.id}-${fIdx}`;
+                        const line = document.getElementById(lineId);
+                        if (line) line.classList.add('highlighted');
+                    }
+                });
+            });
+
+            // Highlight connections from this field
+            if (field.ref) {
+                const targetSchema = schemas.find(s => s.name === field.ref);
+                if (targetSchema) {
+                    const lineId = `line-${schemaId}-${fieldIndex}`;
+                    const line = document.getElementById(lineId);
+                    if (line) line.classList.add('highlighted');
+                }
+            }
+        }
+
+        function updateConnections() {
+            connectionsSvg.innerHTML = '';
+
+            schemas.forEach(schema => {
+                schema.fields.forEach((field, fieldIndex) => {
+                    if (field.ref) {
+                        const targetSchema = schemas.find(s => s.name === field.ref);
+                        if (targetSchema) {
+                            const sourceBox = document.getElementById(`schema-${schema.id}`);
+                            const targetBox = document.getElementById(`schema-${targetSchema.id}`);
+
+                            if (sourceBox && targetBox) {
+                                // Get positions relative to canvas (not viewport)
+                                const sourceX = schema.x + sourceBox.offsetWidth / 2;
+                                const sourceY = schema.y + sourceBox.offsetHeight / 2;
+                                
+                                const targetX = targetSchema.x + targetBox.offsetWidth / 2;
+                                const targetY = targetSchema.y + targetBox.offsetHeight / 2;
+
+                                // Create curved path
+                                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                                const midX = (sourceX + targetX) / 2;
+                                const d = `M ${sourceX} ${sourceY} C ${midX} ${sourceY}, ${midX} ${targetY}, ${targetX} ${targetY}`;
+
+                                path.setAttribute('d', d);
+                                path.setAttribute('class', 'connection-line');
+                                path.setAttribute('id', `line-${schema.id}-${fieldIndex}`);
+                                path.setAttribute('stroke', fieldColors[field.type] || '#58a6ff');
+                                path.onclick = () => highlightFieldConnections(schema.id, fieldIndex);
+
+                                connectionsSvg.appendChild(path);
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        function exportSchema() {
+            const json = JSON.stringify(schemas.map(s => ({
+                name: s.name,
+                timestamps: s.timestamps,
+                fields: s.fields.map(f => ({
+                    name: f.name,
+                    type: f.type,
+                    required: f.required,
+                    unique: f.unique,
+                    index: f.index,
+                    sparse: f.sparse,
+                    ref: f.ref,
+                    default: f.default
+                }))
+            })), null, 2);
+
+            document.getElementById('exportContent').textContent = json;
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function exportMongoose() {
+            let code = "const mongoose = require('mongoose');\nconst Schema = mongoose.Schema;\n\n";
+
+            schemas.forEach(schema => {
+                code += `const ${schema.name}Schema = new Schema({\n`;
+                schema.fields.forEach((field, index) => {
+                    if (field.name !== '_id') {
+                        code += `  ${field.name}: {\n`;
+                        code += `    type: ${field.type === 'ObjectId' ? 'Schema.Types.ObjectId' : field.type},\n`;
+                        if (field.required) code += `    required: true,\n`;
+                        if (field.unique) code += `    unique: true,\n`;
+                        if (field.index) code += `    index: true,\n`;
+                        if (field.sparse) code += `    sparse: true,\n`;
+                        if (field.ref) code += `    ref: '${field.ref}',\n`;
+                        if (field.default) {
+                            if (field.type === 'String' || field.type === 'Date') {
+                                code += `    default: '${field.default}',\n`;
+                            } else if (field.type === 'Boolean') {
+                                code += `    default: ${field.default.toLowerCase() === 'true'},\n`;
+                            } else {
+                                code += `    default: ${field.default},\n`;
+                            }
+                        }
+                        // Remove trailing comma
+                        code = code.replace(/,\n$/, '\n');
+                        code += `  },\n`;
+                    }
+                });
+                code += `}${schema.timestamps ? ', { timestamps: true }' : ''});\n\n`;
+                code += `const ${schema.name} = mongoose.model('${schema.name}', ${schema.name}Schema);\n\n`;
+            });
+
+            code += `module.exports = { ${schemas.map(s => s.name).join(', ')} };`;
+
+            document.getElementById('exportContent').textContent = code;
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('exportModal').classList.remove('active');
+        }
+
+        function zoomIn() {
+            zoom = Math.min(zoom + 0.1, 2);
+            updateZoom();
+        }
+
+        function zoomOut() {
+            zoom = Math.max(zoom - 0.1, 0.5);
+            updateZoom();
+        }
+
+        function updateZoom() {
+            canvas.style.transform = `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`;
+            document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
+            updateConnections();
+        }
+
+        function resetView() {
+            zoom = 1;
+            canvasOffset = { x: 0, y: 0 };
+            updateZoom();
+        }
+
+        // Mouse events for dragging schemas
+        document.addEventListener('mousemove', (e) => {
+            if (draggedSchema) {
+                const schema = draggedSchema;
+                
+                // Calculate new position considering zoom and canvas offset
+                const newX = (e.clientX - canvas.getBoundingClientRect().left - canvasOffset.x) / zoom - dragOffset.x;
+                const newY = (e.clientY - canvas.getBoundingClientRect().top - canvasOffset.y) / zoom - dragOffset.y;
+                
+                schema.x = Math.max(0, newX);
+                schema.y = Math.max(0, newY);
+
+                const box = document.getElementById(`schema-${schema.id}`);
+                if (box) {
+                    box.style.left = schema.x + 'px';
+                    box.style.top = schema.y + 'px';
+                }
+                updateConnections();
+            } else if (isPanning) {
+                canvasOffset.x = e.clientX - panStart.x;
+                canvasOffset.y = e.clientY - panStart.y;
+                updateZoom();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            draggedSchema = null;
+            isPanning = false;
+            canvasContainer.classList.remove('grabbing');
+        });
+
+        // Canvas panning
+        canvasContainer.addEventListener('mousedown', (e) => {
+            if (e.target === canvasContainer || e.target === canvas || e.target === connectionsSvg) {
+                isPanning = true;
+                panStart.x = e.clientX - canvasOffset.x;
+                panStart.y = e.clientY - canvasOffset.y;
+                canvasContainer.classList.add('grabbing');
+                e.preventDefault();
+            }
+        });
+
+        // Zoom with mouse wheel
+        canvasContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoom = Math.min(zoom + 0.05, 2);
+            } else {
+                zoom = Math.max(zoom - 0.05, 0.5);
+            }
+            updateZoom();
+        });
+
+        // Custom context menu
+        canvasContainer.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+
+            const existingMenu = document.querySelector('.context-menu');
+            if (existingMenu) existingMenu.remove();
+
+            const menu = document.createElement('div');
+            menu.className = 'context-menu';
+            menu.style.left = e.clientX + 'px';
+            menu.style.top = e.clientY + 'px';
+
+            const rect = canvasContainer.getBoundingClientRect();
+            const canvasX = (e.clientX - rect.left - canvasOffset.x) / zoom;
+            const canvasY = (e.clientY - rect.top - canvasOffset.y) / zoom;
+
+            menu.innerHTML = `
+                <div class="context-menu-item" onclick="addSchema(${canvasX}, ${canvasY}); closeContextMenu()">
+                    ➕ New Schema
+                </div>
+                <div class="context-menu-separator"></div>
+                <div class="context-menu-item" onclick="resetView(); closeContextMenu()">
+                    🎯 Reset View
+                </div>
+                <div class="context-menu-item" onclick="exportSchema(); closeContextMenu()">
+                    📄 Export JSON
+                </div>
+                <div class="context-menu-item" onclick="exportMongoose(); closeContextMenu()">
+                    🚀 Export Mongoose
+                </div>
+                <div class="context-menu-separator"></div>
+                <div class="context-menu-item" onclick="clearCanvas(); closeContextMenu()">
+                    🗑️ Clear All
+                </div>
+            `;
+
+            document.body.appendChild(menu);
+        });
+
+        function closeContextMenu() {
+            const menu = document.querySelector('.context-menu');
+            if (menu) menu.remove();
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.context-menu')) {
+                closeContextMenu();
+            }
+        });
+
+        // Click outside to deselect
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.schema-box') && !e.target.closest('.connection-line')) {
+                document.querySelectorAll('.field-item').forEach(el => el.classList.remove('highlighted'));
+                document.querySelectorAll('.connection-line').forEach(el => el.classList.remove('highlighted'));
+                highlightedField = null;
+            }
+        });
+
+        // Initialize with two connected schemas
+        addSchema(150, 150);
+        addSchema(550, 150);
+
+        // Add a reference field to demonstrate connections
+        setTimeout(() => {
+            if (schemas.length >= 2) {
+                const schema = schemas[1];
+                schema.fields.push({
+                    name: 'userId',
+                    type: 'ObjectId',
+                    required: true,
+                    unique: false,
+                    index: true,
+                    sparse: false,
+                    ref: schemas[0].name,
+                    default: ''
+                });
+                const body = document.getElementById(`schema-body-${schema.id}`);
+                if (body) {
+                    body.innerHTML = renderFields(schema) +
+                        `<button class="add-field-btn" onclick="addField(${schema.id})">+ Add Field</button>
+                        <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schema.id})">
+                            ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
+                        </button>`;
+                }
+                updateConnections();
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>
