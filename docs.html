@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy-Mongoo - Complete Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #1e1e1e;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo {
+            color: var(--secondary);
+            font-size: 1.8rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--gray);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0.7rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-links a.active {
+            background: rgba(79, 70, 229, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header i {
+            color: var(--secondary);
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+
+        .card-body {
+            line-height: 1.7;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Code Styles */
+        .code-block {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .code-keyword {
+            color: #ff79c6;
+        }
+
+        .code-string {
+            color: #f1fa8c;
+        }
+
+        .code-comment {
+            color: #6272a4;
+        }
+
+        .code-function {
+            color: #50fa7b;
+        }
+
+        .code-operator {
+            color: #ff79c6;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #0da271;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        /* Schema Designer Button */
+        .schema-designer-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 99;
+            background: var(--secondary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .schema-designer-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .schema-designer-btn i {
+            font-size: 1.5rem;
+        }
+
+        .schema-designer-btn span {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            z-index: 101;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--light);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-leaf logo"></i>
+            <h1>Easy-Mongoo</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <h3>Getting Started</h3>
+                <ul class="nav-links">
+                    <li><a href="#introduction" class="active">Introduction</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#quick-start">Quick Start</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Core Concepts</h3>
+                <ul class="nav-links">
+                    <li><a href="#connection">Connection</a></li>
+                    <li><a href="#schema">Schema Creation</a></li>
+                    <li><a href="#models">Models</a></li>
+                    <li><a href="#crud">CRUD Operations</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Advanced Features</h3>
+                <ul class="nav-links">
+                    <li><a href="#virtuals">Virtual Fields</a></li>
+                    <li><a href="#methods">Methods & Statics</a></li>
+                    <li><a href="#middleware">Middleware</a></li>
+                    <li><a href="#transactions">Transactions</a></li>
+                    <li><a href="#aggregation">Aggregation</a></li>
+                    <li><a href="#indexes">Indexes</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Reference</h3>
+                <ul class="nav-links">
+                    <li><a href="#schema-shortcuts">Schema Shortcuts</a></li>
+                    <li><a href="#templates">Predefined Templates</a></li>
+                    <li><a href="#error-handling">Error Handling</a></li>
+                    <li><a href="#debugging">Debugging</a></li>
+                    <li><a href="#api-reference">API Reference</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Examples</h3>
+                <ul class="nav-links">
+                    <li><a href="#basic-example">Basic Usage</a></li>
+                    <li><a href="#advanced-example">Advanced Usage</a></li>
+                    <li><a href="#full-example">Full Application</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Easy-Mongoo</h1>
+            <p>Ultra-simple MongoDB wrapper with all mongoose features in easy syntax</p>
+            <div class="btn-container">
+                <a href="#installation" class="btn btn-large"><i class="fas fa-rocket"></i> Get Started</a>
+                <a href="https://github.com/yourusername/easy-mongoo" class="btn btn-secondary btn-large"><i class="fab fa-github"></i> View on GitHub</a>
+            </div>
+        </section>
+
+        <!-- Introduction -->
+        <section id="introduction" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-info-circle"></i> Introduction</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Easy-Mongoo is a powerful yet simple wrapper for MongoDB with Mongoose. It provides an intuitive API that makes database operations effortless while maintaining all the advanced features of Mongoose.</p>
+                    
+                    <div class="alert alert-info">
+                        <p><strong>Why Easy-Mongoo?</strong> Traditional Mongoose can be complex for beginners. Easy-Mongoo simplifies everything while keeping all the power!</p>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h4>One-Line Operations</h4>
+                            <p>Perform complex database operations with just one line of code</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4>Auto Error Handling</h4>
+                            <p>Automatic error handling with user-friendly messages</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <h4>Smart Schema System</h4>
+                            <p>Create schemas with simple shortcuts and auto-features</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h4>All Mongoose Features</h4>
+                            <p>Virtuals, middleware, transactions, aggregation - everything included!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="installation" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-download"></i> Installation</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Install Easy-Mongoo using npm:</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">Terminal</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code>npm install easy-mongoo</code>
+                    </div>
+                    
+                    <p>Then require it in your project:</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-keyword">const</span> mongoo = <span class="code-function">require</span>(<span class="code-string">'easy-mongoo'</span>);</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section id="quick-start" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-running"></i> Quick Start</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Get started with Easy-Mongoo in just 3 steps:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// 1. Connect to MongoDB</span>
+<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>);
+
+<span class="code-comment">// 2. Create a model with easy schema</span>
+mongoo.model(<span class="code-string">'User'</span>, {
+  name: <span class="code-string">'string!'</span>,
+  email: <span class="code-string">'email'</span>,
+  age: <span class="code-string">'number?'</span>
+});
+
+<span class="code-comment">// 3. Use it!</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
+  name: <span class="code-string">'John Doe'</span>,
+  email: <span class="code-string">'john@example.com'</span>,
+  age: <span class="code-keyword">30</span>
+});
+
+<span class="code-function">console</span>.log(user);</code>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <p><strong>That's it!</strong> You've just created a MongoDB connection, defined a schema, and saved a document with just a few lines of code.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connection -->
+        <section id="connection" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-plug"></i> Connection</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Connect to MongoDB with automatic error handling and logging:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// Basic connection</span>
+<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>);
+
+<span class="code-comment">// With options and debug mode</span>
+<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>, {
+  debug: <span class="code-keyword">true</span>,
+  useNewUrlParser: <span class="code-keyword">true</span>,
+  useUnifiedTopology: <span class="code-keyword">true</span>
+});
+
+<span class="code-comment">// Check connection status</span>
+<span class="code-keyword">const</span> status = mongoo.status();
+<span class="code-function">console</span>.log(status);
+
+<span class="code-comment">// Disconnect when done</span>
+<span class="code-keyword">await</span> mongoo.disconnect();</code>
+                    </div>
+                    
+                    <h4>Connection Status Object</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>connected</td>
+                                <td>Boolean indicating connection status</td>
+                            </tr>
+                            <tr>
+                                <td>database</td>
+                                <td>Name of the connected database</td>
+                            </tr>
+                            <tr>
+                                <td>host</td>
+                                <td>Database host address</td>
+                            </tr>
+                            <tr>
+                                <td>models</td>
+                                <td>Array of registered model names</td>
+                            </tr>
+                            <tr>
+                                <td>readyState</td>
+                                <td>Mongoose connection state</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schema Creation -->
+        <section id="schema" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-database"></i> Schema Creation</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Easy-Mongoo provides an ultra-simple schema system with smart shortcuts:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'schema-basic')">Basic Schema</div>
+                        <div class="tab" onclick="openTab(event, 'schema-advanced')">Advanced Schema</div>
+                        <div class="tab" onclick="openTab(event, 'schema-shortcuts')">All Shortcuts</div>
+                    </div>
+                    
+                    <div id="schema-basic" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Simple schema with shortcuts</span>
+<span class="code-keyword">const</span> userSchema = {
+  <span class="code-comment">// Required string</span>
+  name: <span class="code-string">'string!'</span>,
+  
+  <span class="code-comment">// Optional number</span>
+  age: <span class="code-string">'number?'</span>,
+  
+  <span class="code-comment">// Boolean with default value</span>
+  isActive: <span class="code-string">'boolean+'</span>,
+  
+  <span class="code-comment">// Array of strings</span>
+  tags: [<span class="code-string">'string'</span>],
+  
+  <span class="code-comment">// Object with nested properties</span>
+  address: {
+    street: <span class="code-string">'string!'</span>,
+    city: <span class="code-string">'string!'</span>,
+    country: <span class="code-string">'string!'</span>
+  }
+};</code>
+                        </div>
+                    </div>
+                    
+                    <div id="schema-advanced" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Advanced schema with validations</span>
+<span class="code-keyword">const</span> productSchema = {
+  name: { 
+    type: <span class="code-string">'string'</span>, 
+    required: <span class="code-keyword">true</span>,
+    minlength: [<span class="code-keyword">3</span>, <span class="code-string">'Name must be at least 3 characters'</span>],
+    maxlength: [<span class="code-keyword">50</span>, <span class="code-string">'Name cannot exceed 50 characters'</span>]
+  },
+  
+  price: { 
+    type: <span class="code-string">'number'</span>, 
+    required: <span class="code-keyword">true</span>,
+    min: [<span class="code-keyword">0</span>, <span class="code-string">'Price cannot be negative'</span>]
+  },
+  
+  category: {
+    type: <span class="code-string">'string'</span>,
+    enum: [<span class="code-string">'Electronics'</span>, <span class="code-string">'Clothing'</span>, <span class="code-string">'Books'</span>],
+    default: <span class="code-string">'Electronics'</span>
+  },
+  
+  inStock: { 
+    type: <span class="code-string">'boolean'</span>, 
+    default: <span class="code-keyword">true</span> 
+  }
+};</code>
+                        </div>
+                    </div>
+                    
+                    <div id="schema-shortcuts" class="tab-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Shortcut</th>
+                                    <th>Description</th>
+                                    <th>Equivalent To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>'string!'</code></td>
+                                    <td>Required string</td>
+                                    <td><code>{ type: String, required: true }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'number?'</code></td>
+                                    <td>Optional number</td>
+                                    <td><code>Number</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'boolean+'</code></td>
+                                    <td>Boolean with default false</td>
+                                    <td><code>{ type: Boolean, default: false }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'email'</code></td>
+                                    <td>Email with validation</td>
+                                    <td><code>{ type: String, required: true, match: emailRegex }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'password'</code></td>
+                                    <td>Password with min length</td>
+                                    <td><code>{ type: String, required: true, minlength: 6 }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'url'</code></td>
+                                    <td>URL with validation</td>
+                                    <td><code>{ type: String, match: urlRegex }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'userRef'</code></td>
+                                    <td>Reference to User model</td>
+                                    <td><code>{ type: ObjectId, ref: 'User' }</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Models -->
+        <section id="models" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-cube"></i> Models</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Create models with automatic features and enhancements:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// Create a model</span>
+<span class="code-keyword">const</span> User = mongoo.model(<span class="code-string">'User'</span>, {
+  firstName: <span class="code-string">'string!'</span>,
+  lastName: <span class="code-string">'string!'</span>,
+  email: <span class="code-string">'email'</span>,
+  birthDate: <span class="code-string">'date?'</span>
+});
+
+<span class="code-comment">// Get existing model</span>
+<span class="code-keyword">const</span> User = mongoo.getModel(<span class="code-string">'User'</span>);
+
+<span class="code-comment">// Use predefined template</span>
+<span class="code-keyword">const</span> User = mongoo.model(<span class="code-string">'User'</span>, mongoo.templates.user);</code>
+                    </div>
+                    
+                    <h4>Auto-Features Included:</h4>
+                    <ul>
+                        <li><strong>Timestamps:</strong> Automatic createdAt and updatedAt fields</li>
+                        <li><strong>Indexes:</strong> Auto-indexing for common fields</li>
+                        <li><strong>Virtuals:</strong> Automatic virtual fields (fullName, age, etc.)</li>
+                        <li><strong>Middleware:</strong> Auto-hooks for common operations</li>
+                        <li><strong>Validation:</strong> Smart validation with friendly messages</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CRUD Operations -->
+        <section id="crud" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-tasks"></i> CRUD Operations</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Complete CRUD operations with simplified syntax:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'crud-create')">Create</div>
+                        <div class="tab" onclick="openTab(event, 'crud-read')">Read</div>
+                        <div class="tab" onclick="openTab(event, 'crud-update')">Update</div>
+                        <div class="tab" onclick="openTab(event, 'crud-delete')">Delete</div>
+                    </div>
+                    
+                    <div id="crud-create" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Create a single document</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
+  name: <span class="code-string">'Alice'</span>,
+  email: <span class="code-string">'alice@example.com'</span>,
+  age: <span class="code-keyword">28</span>
+});
+
+<span class="code-comment">// Create multiple documents</span>
+<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> User.create([
+  { name: <span class="code-string">'Bob'</span>, email: <span class="code-string">'bob@example.com'</span> },
+  { name: <span class="code-string">'Charlie'</span>, email: <span class="code-string">'charlie@example.com'</span> }
+]);
+
+<span class="code-comment">// Find or create</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findOrCreate(<span class="code-string">'User'</span>, 
+  { email: <span class="code-string">'alice@example.com'</span> },
+  { name: <span class="code-string">'Alice'</span>, age: <span class="code-keyword">28</span> }
+);</code>
+                        </div>
+                    </div>
+                    
+                    <div id="crud-read" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Find all documents</span>
+<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>);
+
+<span class="code-comment">// Find with filter</span>
+<span class="code-keyword">const</span> activeUsers = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>, { 
+  isActive: <span class="code-keyword">true</span>,
+  age: { <span class="code-operator">$gte</span>: <span class="code-keyword">18</span> }
+});
+
+<span class="code-comment">// Find one document</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findOne(<span class="code-string">'User'</span>, { 
+  email: <span class="code-string">'alice@example.com'</span> 
+});
+
+<span class="code-comment">// Find by ID</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'507f1f77bcf86cd799439011'</span>);
+
+<span class="code-comment">// Find with options</span>
+<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>, {}, {
+  sort: { createdAt: -<span class="code-keyword">1</span> },
+  limit: <span class="code-keyword">10</span>,
+  select: <span class="code-string">'name email'</span>,
+  populate: <span class="code-string">'posts'</span>
+});</code>
+                        </div>
+                    </div>
+                    
+                    <div id="crud-update" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Update multiple documents</span>
+<span class="code-keyword">await</span> mongoo.update(<span class="code-string">'User'</span>, 
+  { isActive: <span class="code-keyword">false</span> }, 
+  { status: <span class="code-string">'inactive'</span> }
+);
+
+<span class="code-comment">// Update by ID</span>
+<span class="code-keyword">const</span> updatedUser = <span class="code-keyword">await</span> mongoo.updateById(
+  <span class="code-string">'User'</span>, 
+  <span class="code-string">'507f1f77bcf86cd799439011'</span>,
+  { age: <span class="code-keyword">29</span>, lastLogin: <span class="code-keyword">new</span> Date() }
+);
+
+<span class="code-comment">// Save (create or update)</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.save(<span class="code-string">'User'</span>, {
+  _id: <span class="code-string">'507f1f77bcf86cd799439011'</span>, <span class="code-comment">// If provided, updates existing</span>
+  name: <span class="code-string">'Alice Updated'</span>,
+  email: <span class="code-string">'alice.updated@example.com'</span>
+});</code>
+                        </div>
+                    </div>
+                    
+                    <div id="crud-delete" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Delete multiple documents</span>
+<span class="code-keyword">await</span> mongoo.delete(<span class="code-string">'User'</span>, { 
+  isActive: <span class="code-keyword">false</span> 
+});
+
+<span class="code-comment">// Delete by ID</span>
+<span class="code-keyword">await</span> mongoo.deleteById(<span class="code-string">'User'</span>, <span class="code-string">'507f1f77bcf86cd799439011'</span>);
+
+<span class="code-comment">// Check if document exists</span>
+<span class="code-keyword">const</span> exists = <span class="code-keyword">await</span> mongoo.exists(<span class="code-string">'User'</span>, { 
+  email: <span class="code-string">'alice@example.com'</span> 
+});
+
+<span class="code-comment">// Count documents</span>
+<span class="code-keyword">const</span> count = <span class="code-keyword">await</span> mongoo.count(<span class="code-string">'User'</span>, { 
+  isActive: <span class="code-keyword">true</span> 
+});</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- More sections would continue here... -->
+
+        <!-- Schema Designer Button -->
+        <a href="/schema-design.html" class="schema-designer-btn">
+            <i class="fas fa-palette"></i>
+            <span>New</span>
+        </a>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const textArea = document.createElement('textarea');
+            textArea.value = codeBlock.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Visual feedback
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            
+            const tablinks = document.getElementsByClassName('tab');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // Update active nav link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
