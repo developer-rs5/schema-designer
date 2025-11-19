@@ -498,68 +498,146 @@
         .db-type-badge.easy-mongoo {
             background: #bc8cff;
         }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .login-btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: #2ea043;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 20px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .user-name {
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: #da3633;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .logout-btn:hover {
+            background: #f85149;
+        }
     </style>
 </head>
 
 <body>
-    <div class="toolbar">
-        <div class="title">🍃 MongoDB Schema Designer</div>
-        <div class="project-selector">
-            <select id="projectSelect" onchange="switchProject(this.value)"></select>
-            <button onclick="showNewProjectModal()">+ New Project</button>
-        </div>
-        <button onclick="addSchema()">+ New Schema</button>
-        <button class="secondary" onclick="exportSchema()">Export JSON</button>
-        <button class="secondary" onclick="exportCode()">Export Code</button>
-        <button class="secondary" onclick="clearCanvas()">Clear All</button>
-        <div class="separator"></div>
-        <button class="secondary" onclick="resetView()">Reset View</button>
+    <!-- Login Screen (shown when not authenticated) -->
+    <div id="loginScreen" class="login-container">
+        <h1>🍃 MongoDB Schema Designer</h1>
+        <p>Design your MongoDB schemas visually with ease</p>
+        <button class="login-btn" onclick="login()">Login to Get Started</button>
+        <p style="color: #8b949e; font-size: 14px;">Free to use with your ZenuxOAuth account</p>
     </div>
 
-    <div class="canvas-container" id="canvasContainer">
-        <div class="canvas" id="canvas">
-            <svg class="connections-svg" id="connectionsSvg"></svg>
-        </div>
-    </div>
-
-    <div class="zoom-controls">
-        <button onclick="zoomOut()">−</button>
-        <div class="zoom-level" id="zoomLevel">100%</div>
-        <button onclick="zoomIn()">+</button>
-    </div>
-
-    <div class="modal" id="exportModal">
-        <div class="modal-content">
-            <h2>Exported Schema</h2>
-            <pre id="exportContent"></pre>
-            <button class="modal-close" onclick="closeModal()">Close</button>
-        </div>
-    </div>
-
-    <div class="modal" id="newProjectModal">
-        <div class="modal-content">
-            <h2>Create New Project</h2>
-            <div style="display: grid; gap: 16px; margin-top: 20px;">
-                <div>
-                    <label style="display: block; margin-bottom: 6px; color: #c9d1d9;">Project Name</label>
-                    <input type="text" id="newProjectName" style="width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9;" placeholder="Enter project name">
-                </div>
-                <div>
-                    <label style="display: block; margin-bottom: 6px; color: #c9d1d9;">Database Type</label>
-                    <select id="newProjectDbType" style="width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9;">
-                        <option value="mongoose">Mongoose (Standard)</option>
-                        <option value="easy-mongoo">Easy-Mongoo (Shortcuts)</option>
-                    </select>
-                </div>
+    <!-- Main Application (shown when authenticated) -->
+    <div id="app" style="display: none;">
+        <div class="toolbar">
+            <div class="title">🍃 MongoDB Schema Designer <span class="project-name" id="projectName"></span> <span class="db-type-badge" id="dbTypeBadge"></span></div>
+            <div class="user-info" id="userInfo">
+                <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
+                <span id="userName" class="user-name"></span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="modal-close" onclick="createNewProject()">Create Project</button>
-                <button class="modal-close secondary" onclick="closeNewProjectModal()">Cancel</button>
+            <div class="project-selector">
+                <select id="projectSelect" onchange="switchProject(this.value)"></select>
+                <button onclick="showNewProjectModal()">+ New Project</button>
+            </div>
+            <button onclick="addSchema()">+ New Schema</button>
+            <button class="secondary" onclick="exportSchema()">Export JSON</button>
+            <button class="secondary" onclick="exportCode()">Export Code</button>
+            <button class="secondary" onclick="clearCanvas()">Clear All</button>
+            <div class="separator"></div>
+            <button class="secondary" onclick="resetView()">Reset View</button>
+        </div>
+
+        <div class="canvas-container" id="canvasContainer">
+            <div class="canvas" id="canvas">
+                <svg class="connections-svg" id="connectionsSvg"></svg>
             </div>
         </div>
+
+        <div class="zoom-controls">
+            <button onclick="zoomOut()">−</button>
+            <div class="zoom-level" id="zoomLevel">100%</div>
+            <button onclick="zoomIn()">+</button>
+        </div>
+
+        <div class="modal" id="exportModal">
+            <div class="modal-content">
+                <h2>Exported Schema</h2>
+                <pre id="exportContent"></pre>
+                <button class="modal-close" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+
+        <div class="modal" id="newProjectModal">
+            <div class="modal-content">
+                <h2>Create New Project</h2>
+                <div style="display: grid; gap: 16px; margin-top: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; color: #c9d1d9;">Project Name</label>
+                        <input type="text" id="newProjectName" style="width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9;" placeholder="Enter project name">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; color: #c9d1d9;">Database Type</label>
+                        <select id="newProjectDbType" style="width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9;">
+                            <option value="easy-mongoo">Easy-Mongoo (Shortcuts)</option>
+                            <option value="mongoose">Mongoose (Standard)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="modal-close" onclick="createNewProject()">Create Project</button>
+                    <button class="modal-close secondary" onclick="closeNewProjectModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="https://unpkg.com/zenuxs-oauth@1.0.8/dist/zenux-oauth.min.js"></script>
     <script>
+        // OAuth Configuration
+        let oauth = null;
+        let user = null;
+
         // Project management
         let projects = JSON.parse(localStorage.getItem('mongodb-schema-projects')) || [];
         let currentProjectId = localStorage.getItem('current-project-id');
@@ -581,6 +659,8 @@
         const canvasContainer = document.getElementById('canvasContainer');
         const connectionsSvg = document.getElementById('connectionsSvg');
         const projectSelect = document.getElementById('projectSelect');
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
 
         const fieldTypes = [
             'String', 'Number', 'Boolean', 'Date', 'ObjectId',
@@ -600,14 +680,76 @@
             'Map': '#ff7b72'
         };
 
+        // Initialize OAuth
+        function initOAuth() {
+            oauth = new ZenuxOAuth({
+                clientId: '5fa601a20c69ab01',
+                authServer: 'https://api.auth.zenuxs.in',
+                redirectUri: "http://localhost:5501/callback.html",
+                debug: false
+            });
+
+            // Check if user is already logged in
+            checkAuthStatus();
+        }
+
+        async function checkAuthStatus() {
+            try {
+                const tokens = oauth.getTokens();
+                if (tokens && tokens.access_token) {
+                    user = await oauth.getUserInfo();
+                    showApp();
+                } else {
+                    showLogin();
+                }
+            } catch (e) {
+                console.log('Not authenticated');
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            loginScreen.style.display = 'flex';
+            app.style.display = 'none';
+        }
+
+        function showApp() {
+            loginScreen.style.display = 'none';
+            app.style.display = 'block';
+            
+            // Update user info
+            document.getElementById('userAvatar').src = user.picture;
+            document.getElementById('userName').textContent = user.name;
+            
+            // Initialize projects
+            initProjects();
+        }
+
+        async function login() {
+            try {
+                const tokens = await oauth.login({ popup: true });
+                user = await oauth.getUserInfo();
+                showApp();
+            } catch (e) {
+                console.error('Login error:', e);
+                alert('Login failed. Please try again.');
+            }
+        }
+
+        async function logout() {
+            await oauth.logout();
+            user = null;
+            showLogin();
+        }
+
         // Initialize projects
         function initProjects() {
             if (projects.length === 0) {
                 // Create a default project
                 const defaultProject = {
                     id: generateId(),
-                    name: 'Default Project',
-                    dbType: 'mongoose',
+                    name: 'My First Project',
+                    dbType: 'easy-mongoo',
                     schemas: [],
                     createdAt: new Date().toISOString()
                 };
@@ -651,8 +793,9 @@
             });
 
             // Update title with project name and type
-            const title = document.querySelector('.title');
-            title.innerHTML = `🍃 MongoDB Schema Designer <span class="project-name">${currentProject.name}</span> <span class="db-type-badge ${currentProject.dbType}">${currentProject.dbType}</span>`;
+            document.getElementById('projectName').textContent = currentProject.name;
+            document.getElementById('dbTypeBadge').textContent = currentProject.dbType;
+            document.getElementById('dbTypeBadge').className = `db-type-badge ${currentProject.dbType}`;
         }
 
         function switchProject(projectId) {
@@ -1192,35 +1335,38 @@
                     if (field.name !== '_id') {
                         code += `  ${field.name}: {\n`;
                         code += `    type: ${field.type === 'ObjectId' ? 'Schema.Types.ObjectId' : field.type},\n`;
-                        if (field.required) code += `    required: true,\n`;
-                        if (field.unique) code += `    unique: true,\n`;
-                        if (field.index) code += `    index: true,\n`;
-                        if (field.sparse) code += `    sparse: true,\n`;
-                        if (field.ref) code += `    ref: '${field.ref}',\n`;
+                        
+                        // Only add non-empty properties
+                        const props = [];
+                        if (field.required) props.push(`required: true`);
+                        if (field.unique) props.push(`unique: true`);
+                        if (field.index) props.push(`index: true`);
+                        if (field.sparse) props.push(`sparse: true`);
+                        if (field.ref) props.push(`ref: '${field.ref}'`);
                         if (field.default) {
                             if (field.type === 'String' || field.type === 'Date') {
-                                code += `    default: '${field.default}',\n`;
+                                props.push(`default: '${field.default}'`);
                             } else if (field.type === 'Boolean') {
-                                code += `    default: ${field.default.toLowerCase() === 'true'},\n`;
+                                props.push(`default: ${field.default.toLowerCase() === 'true'}`);
                             } else {
-                                code += `    default: ${field.default},\n`;
+                                props.push(`default: ${field.default}`);
                             }
                         }
-                        if (field.min) code += `    min: ${field.min},\n`;
-                        if (field.max) code += `    max: ${field.max},\n`;
+                        if (field.min) props.push(`min: ${field.min}`);
+                        if (field.max) props.push(`max: ${field.max}`);
                         if (field.enum && field.enum.length > 0) {
-                            code += `    enum: ${JSON.stringify(field.enum)},\n`;
+                            props.push(`enum: ${JSON.stringify(field.enum)}`);
                         }
-                        if (field.match) code += `    match: ${field.match},\n`;
-                        if (field.lowercase) code += `    lowercase: true,\n`;
-                        if (field.uppercase) code += `    uppercase: true,\n`;
-                        if (field.trim) code += `    trim: true,\n`;
-                        if (field.minlength) code += `    minlength: ${field.minlength},\n`;
-                        if (field.maxlength) code += `    maxlength: ${field.maxlength},\n`;
-                        if (field.validate) code += `    validate: ${field.validate},\n`;
-                        // Remove trailing comma
-                        code = code.replace(/,\n$/, '\n');
-                        code += `  },\n`;
+                        if (field.match) props.push(`match: ${field.match}`);
+                        if (field.lowercase) props.push(`lowercase: true`);
+                        if (field.uppercase) props.push(`uppercase: true`);
+                        if (field.trim) props.push(`trim: true`);
+                        if (field.minlength) props.push(`minlength: ${field.minlength}`);
+                        if (field.maxlength) props.push(`maxlength: ${field.maxlength}`);
+                        if (field.validate) props.push(`validate: ${field.validate}`);
+                        
+                        code += props.map(p => `    ${p}`).join(',\n');
+                        code += `\n  },\n`;
                     }
                 });
                 code += `}${schema.timestamps ? ', { timestamps: true }' : ''});\n\n`;
@@ -1327,34 +1473,36 @@
                     
                     // If no shortcut applies, use normal syntax
                     if (!fieldDef) {
-                        fieldDef = `{\n    type: ${field.type === 'ObjectId' ? 'mongoo.Schema.Types.ObjectId' : field.type}`;
-                        if (field.required) fieldDef += `,\n    required: true`;
-                        if (field.unique) fieldDef += `,\n    unique: true`;
-                        if (field.index) fieldDef += `,\n    index: true`;
-                        if (field.sparse) fieldDef += `,\n    sparse: true`;
-                        if (field.ref) fieldDef += `,\n    ref: '${field.ref}'`;
+                        const props = [];
+                        props.push(`type: ${field.type === 'ObjectId' ? 'mongoo.Schema.Types.ObjectId' : field.type}`);
+                        if (field.required) props.push(`required: true`);
+                        if (field.unique) props.push(`unique: true`);
+                        if (field.index) props.push(`index: true`);
+                        if (field.sparse) props.push(`sparse: true`);
+                        if (field.ref) props.push(`ref: '${field.ref}'`);
                         if (field.default) {
                             if (field.type === 'String' || field.type === 'Date') {
-                                fieldDef += `,\n    default: '${field.default}'`;
+                                props.push(`default: '${field.default}'`);
                             } else if (field.type === 'Boolean') {
-                                fieldDef += `,\n    default: ${field.default.toLowerCase() === 'true'}`;
+                                props.push(`default: ${field.default.toLowerCase() === 'true'}`);
                             } else {
-                                fieldDef += `,\n    default: ${field.default}`;
+                                props.push(`default: ${field.default}`);
                             }
                         }
-                        if (field.min) fieldDef += `,\n    min: ${field.min}`;
-                        if (field.max) fieldDef += `,\n    max: ${field.max}`;
+                        if (field.min) props.push(`min: ${field.min}`);
+                        if (field.max) props.push(`max: ${field.max}`);
                         if (field.enum && field.enum.length > 0) {
-                            fieldDef += `,\n    enum: ${JSON.stringify(field.enum)}`;
+                            props.push(`enum: ${JSON.stringify(field.enum)}`);
                         }
-                        if (field.match) fieldDef += `,\n    match: ${field.match}`;
-                        if (field.lowercase) fieldDef += `,\n    lowercase: true`;
-                        if (field.uppercase) fieldDef += `,\n    uppercase: true`;
-                        if (field.trim) fieldDef += `,\n    trim: true`;
-                        if (field.minlength) fieldDef += `,\n    minlength: ${field.minlength}`;
-                        if (field.maxlength) fieldDef += `,\n    maxlength: ${field.maxlength}`;
-                        if (field.validate) fieldDef += `,\n    validate: ${field.validate}`;
-                        fieldDef += `\n  }`;
+                        if (field.match) props.push(`match: ${field.match}`);
+                        if (field.lowercase) props.push(`lowercase: true`);
+                        if (field.uppercase) props.push(`uppercase: true`);
+                        if (field.trim) props.push(`trim: true`);
+                        if (field.minlength) props.push(`minlength: ${field.minlength}`);
+                        if (field.maxlength) props.push(`maxlength: ${field.maxlength}`);
+                        if (field.validate) props.push(`validate: ${field.validate}`);
+                        
+                        fieldDef = `{\n    ${props.join(',\n    ')}\n  }`;
                     }
                     
                     code += `  ${field.name}: ${fieldDef},\n`;
@@ -1506,8 +1654,10 @@
             }
         });
 
-        // Initialize
-        initProjects();
+        // Initialize OAuth when page loads
+        window.onload = function() {
+            initOAuth();
+        };
     </script>
 </body>
 
