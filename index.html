@@ -1,1068 +1,1206 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MongoDB Schema Designer</title>
+    <title>Easy-Mongoo - Complete Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --darker: #0a0f1c;
+            --light: #cbd5e1;
+            --gray: #64748b;
+            --border: #334155;
+            --code-bg: #1e293b;
+            --code-highlight: #334155;
+            --sidebar-width: 280px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            overflow: hidden;
-            user-select: none;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
         }
 
-        .toolbar {
-            background: #161b22;
-            border-bottom: 1px solid #30363d;
-            padding: 12px 20px;
+        .container {
             display: flex;
-            gap: 15px;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            min-height: 100vh;
         }
 
-        .toolbar button {
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .toolbar button:hover {
-            background: #2ea043;
-        }
-
-        .toolbar button.secondary {
-            background: #21262d;
-            border: 1px solid #30363d;
-        }
-
-        .toolbar button.secondary:hover {
-            background: #30363d;
-        }
-
-        .toolbar .separator {
-            width: 1px;
-            height: 24px;
-            background: #30363d;
-        }
-
-        .toolbar .title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-right: auto;
-            color: #58a6ff;
-        }
-
-        .canvas-container {
-            width: 100vw;
-            height: calc(100vh - 60px);
-            overflow: hidden;
-            position: relative;
-            cursor: grab;
-            background:
-                linear-gradient(#1a1f26 1px, transparent 1px),
-                linear-gradient(90deg, #1a1f26 1px, transparent 1px);
-            background-size: 30px 30px;
-            background-position: 0 0;
-        }
-
-        .canvas-container.grabbing {
-            cursor: grabbing;
-        }
-
-        .canvas {
-            position: absolute;
-            transform-origin: 0 0;
-            width: 10000px;
-            height: 10000px;
-        }
-
-        .connections-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .schema-box {
-            position: absolute;
-            background: #161b22;
-            border: 2px solid #30363d;
-            border-radius: 8px;
-            min-width: 350px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            transition: box-shadow 0.2s;
-            z-index: 1;
-        }
-
-        .schema-box.selected {
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
-        }
-
-        .schema-header {
-            background: #21262d;
-            padding: 12px 16px;
-            border-bottom: 1px solid #30363d;
-            cursor: move;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 6px 6px 0 0;
-        }
-
-        .schema-header input {
-            background: transparent;
-            border: none;
-            color: #58a6ff;
-            font-size: 16px;
-            font-weight: 600;
-            outline: none;
-            width: 100%;
-        }
-
-        .schema-header .delete-btn {
-            background: #da3633;
-            color: white;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .schema-body {
-            padding: 12px;
-        }
-
-        .field-item {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 8px;
-            position: relative;
-        }
-
-        .field-item.highlighted {
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
-        }
-
-        .field-main-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .field-item input,
-        .field-item select {
-            background: #161b22;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 13px;
-            outline: none;
-            width: 100%;
-        }
-
-        .field-item input:focus,
-        .field-item select:focus {
-            border-color: #58a6ff;
-        }
-
-        .field-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-
-        .ref-select {
-            grid-column: 1 / -1;
-            margin-top: 4px;
-        }
-
-        .remove-field {
-            background: #da3633;
-            color: white;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .remove-field:hover {
-            background: #f85149;
-        }
-
-        .add-field-btn {
-            width: 100%;
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        .add-field-btn:hover {
-            background: #2ea043;
-        }
-
-        .timestamp-toggle {
-            width: 100%;
-            background: #1f6feb;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        .timestamp-toggle:hover {
-            background: #388bfd;
-        }
-
-        .timestamp-toggle.active {
-            background: #2ea043;
-        }
-
-        .connection-line {
-            stroke-width: 2.5;
-            fill: none;
-            cursor: pointer;
-            transition: stroke-width 0.2s;
-        }
-
-        .connection-line:hover {
-            stroke-width: 4;
-        }
-
-        .connection-line.highlighted {
-            stroke-width: 4;
-            filter: drop-shadow(0 0 6px currentColor);
-        }
-
-        .context-menu {
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: var(--light);
             position: fixed;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 6px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            z-index: 10000;
-            min-width: 200px;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 100;
+            border-right: 1px solid var(--border);
         }
 
-        .context-menu-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 4px;
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #c9d1d9;
-            font-size: 14px;
         }
 
-        .context-menu-item:hover {
-            background: #21262d;
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
-        .context-menu-separator {
-            height: 1px;
-            background: #30363d;
-            margin: 4px 0;
+        .logo {
+            color: var(--secondary);
+            font-size: 1.8rem;
         }
 
-        .modal {
-            display: none;
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--gray);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0.7rem 1.5rem;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-links a.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header i {
+            color: var(--secondary);
+        }
+
+        .card {
+            background: var(--dark);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
+            color: var(--light);
+        }
+
+        .card-body {
+            line-height: 1.7;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Code Styles */
+        .code-block {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: 1px solid var(--border);
+        }
+
+        .code-block code {
+            display: block;
+            white-space: pre;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-title {
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .code-keyword {
+            color: #ff79c6;
+        }
+
+        .code-string {
+            color: #f1fa8c;
+        }
+
+        .code-comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .code-function {
+            color: #50fa7b;
+        }
+
+        .code-operator {
+            color: #ff79c6;
+        }
+
+        .code-number {
+            color: #bd93f9;
+        }
+
+        .code-property {
+            color: #8be9fd;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #0da271;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        /* Schema Designer Button */
+        .schema-designer-btn {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 99;
+            background: var(--secondary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .schema-designer-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .schema-designer-btn i {
+            font-size: 1.5rem;
+        }
+
+        .schema-designer-btn span {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow: auto;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
-        }
-
-        .modal-content h2 {
-            color: #58a6ff;
-            margin-bottom: 16px;
-        }
-
-        .modal-content pre {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 16px;
-            overflow-x: auto;
-            color: #c9d1d9;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .modal-close {
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-
-        .zoom-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            gap: 8px;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
-
-        .zoom-controls button {
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .zoom-level {
-            padding: 0 12px;
-            display: flex;
-            align-items: center;
-            color: #58a6ff;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .default-input {
-            margin-top: 4px;
-        }
-
-        .field-options-dropdown {
-            margin-top: 8px;
-            padding: 8px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 4px;
-        }
-
-        .field-options-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            cursor: pointer;
-        }
-
-        .field-options-header span {
-            font-size: 12px;
-            color: #8b949e;
-            font-weight: 600;
-        }
-
-        .field-options-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .field-options-content.collapsed {
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
             display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            z-index: 101;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--dark);
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            color: var(--gray);
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #93c5fd;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #6ee7b7;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fcd34d;
+            border-left: 4px solid #f59e0b;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray);
         }
     </style>
 </head>
-
 <body>
-    <div class="toolbar">
-        <div class="title">🍃 MongoDB Schema Designer</div>
-        <button onclick="addSchema()">+ New Schema</button>
-        <button class="secondary" onclick="exportSchema()">Export JSON</button>
-        <button class="secondary" onclick="exportMongoose()">Export Mongoose</button>
-        <button class="secondary" onclick="clearCanvas()">Clear All</button>
-        <div class="separator"></div>
-        <button class="secondary" onclick="resetView()">Reset View</button>
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
     </div>
 
-    <div class="canvas-container" id="canvasContainer">
-        <div class="canvas" id="canvas">
-            <svg class="connections-svg" id="connectionsSvg"></svg>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-leaf logo"></i>
+            <h1>Easy-Mongoo</h1>
         </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <h3>Getting Started</h3>
+                <ul class="nav-links">
+                    <li><a href="#introduction" class="active">Introduction</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#quick-start">Quick Start</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Core Concepts</h3>
+                <ul class="nav-links">
+                    <li><a href="#connection">Connection</a></li>
+                    <li><a href="#schema">Schema Creation</a></li>
+                    <li><a href="#models">Models</a></li>
+                    <li><a href="#crud">CRUD Operations</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Advanced Features</h3>
+                <ul class="nav-links">
+                    <li><a href="#virtuals">Virtual Fields</a></li>
+                    <li><a href="#methods">Methods & Statics</a></li>
+                    <li><a href="#middleware">Middleware</a></li>
+                    <li><a href="#transactions">Transactions</a></li>
+                    <li><a href="#aggregation">Aggregation</a></li>
+                    <li><a href="#indexes">Indexes</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Reference</h3>
+                <ul class="nav-links">
+                    <li><a href="#schema-shortcuts">Schema Shortcuts</a></li>
+                    <li><a href="#templates">Predefined Templates</a></li>
+                    <li><a href="#error-handling">Error Handling</a></li>
+                    <li><a href="#debugging">Debugging</a></li>
+                    <li><a href="#api-reference">API Reference</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Examples</h3>
+                <ul class="nav-links">
+                    <li><a href="#basic-example">Basic Usage</a></li>
+                    <li><a href="#advanced-example">Advanced Usage</a></li>
+                    <li><a href="#full-example">Full Application</a></li>
+                </ul>
+            </div>
+        </nav>
     </div>
 
-    <div class="zoom-controls">
-        <button onclick="zoomOut()">−</button>
-        <div class="zoom-level" id="zoomLevel">100%</div>
-        <button onclick="zoomIn()">+</button>
-    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Easy-Mongoo</h1>
+            <p>Ultra-simple MongoDB wrapper with all mongoose features in easy syntax</p>
+            <div class="btn-container">
+                <a href="#installation" class="btn btn-large"><i class="fas fa-rocket"></i> Get Started</a>
+                <a href="https://github.com/yourusername/easy-mongoo" class="btn btn-secondary btn-large"><i class="fab fa-github"></i> View on GitHub</a>
+            </div>
+        </section>
 
-    <div class="modal" id="exportModal">
-        <div class="modal-content">
-            <h2>Exported Schema</h2>
-            <pre id="exportContent"></pre>
-            <button class="modal-close" onclick="closeModal()">Close</button>
-        </div>
+        <!-- Introduction -->
+        <section id="introduction" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-info-circle"></i> Introduction</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Easy-Mongoo is a powerful yet simple wrapper for MongoDB with Mongoose. It provides an intuitive API that makes database operations effortless while maintaining all the advanced features of Mongoose.</p>
+                    
+                    <div class="alert alert-info">
+                        <p><strong>Why Easy-Mongoo?</strong> Traditional Mongoose can be complex for beginners. Easy-Mongoo simplifies everything while keeping all the power!</p>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h4>One-Line Operations</h4>
+                            <p>Perform complex database operations with just one line of code</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4>Auto Error Handling</h4>
+                            <p>Automatic error handling with user-friendly messages</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <h4>Smart Schema System</h4>
+                            <p>Create schemas with simple shortcuts and auto-features</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h4>All Mongoose Features</h4>
+                            <p>Virtuals, middleware, transactions, aggregation - everything included!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="installation" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-download"></i> Installation</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Install Easy-Mongoo using npm:</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">Terminal</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code>npm install easy-mongoo</code>
+                    </div>
+                    
+                    <p>Then require it in your project:</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-keyword">const</span> mongoo = <span class="code-function">require</span>(<span class="code-string">'easy-mongoo'</span>);</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section id="quick-start" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-running"></i> Quick Start</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Get started with Easy-Mongoo in just 3 steps:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// 1. Connect to MongoDB</span>
+<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>);
+
+<span class="code-comment">// 2. Create a model with easy schema</span>
+mongoo.model(<span class="code-string">'User'</span>, {
+  <span class="code-property">name</span>: <span class="code-string">'string!'</span>,
+  <span class="code-property">email</span>: <span class="code-string">'email'</span>,
+  <span class="code-property">age</span>: <span class="code-string">'number?'</span>
+});
+
+<span class="code-comment">// 3. Use it!</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
+  <span class="code-property">name</span>: <span class="code-string">'John Doe'</span>,
+  <span class="code-property">email</span>: <span class="code-string">'john@example.com'</span>,
+  <span class="code-property">age</span>: <span class="code-number">30</span>
+});
+
+<span class="code-function">console</span>.log(user);</code>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <p><strong>That's it!</strong> You've just created a MongoDB connection, defined a schema, and saved a document with just a few lines of code.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connection -->
+        <section id="connection" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-plug"></i> Connection</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Connect to MongoDB with automatic error handling and logging:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// Basic connection</span>
+<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>);
+
+<span class="code-comment">// With options and debug mode</span>
+<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>, {
+  <span class="code-property">debug</span>: <span class="code-keyword">true</span>,
+  <span class="code-property">useNewUrlParser</span>: <span class="code-keyword">true</span>,
+  <span class="code-property">useUnifiedTopology</span>: <span class="code-keyword">true</span>
+});
+
+<span class="code-comment">// Check connection status</span>
+<span class="code-keyword">const</span> status = mongoo.status();
+<span class="code-function">console</span>.log(status);
+
+<span class="code-comment">// Disconnect when done</span>
+<span class="code-keyword">await</span> mongoo.disconnect();</code>
+                    </div>
+                    
+                    <h4>Connection Status Object</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>connected</td>
+                                <td>Boolean indicating connection status</td>
+                            </tr>
+                            <tr>
+                                <td>database</td>
+                                <td>Name of the connected database</td>
+                            </tr>
+                            <tr>
+                                <td>host</td>
+                                <td>Database host address</td>
+                            </tr>
+                            <tr>
+                                <td>models</td>
+                                <td>Array of registered model names</td>
+                            </tr>
+                            <tr>
+                                <td>readyState</td>
+                                <td>Mongoose connection state</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schema Creation -->
+        <section id="schema" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-database"></i> Schema Creation</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Easy-Mongoo provides an ultra-simple schema system with smart shortcuts:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'schema-basic')">Basic Schema</div>
+                        <div class="tab" onclick="openTab(event, 'schema-advanced')">Advanced Schema</div>
+                        <div class="tab" onclick="openTab(event, 'schema-shortcuts')">All Shortcuts</div>
+                    </div>
+                    
+                    <div id="schema-basic" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Simple schema with shortcuts</span>
+<span class="code-keyword">const</span> userSchema = {
+  <span class="code-comment">// Required string</span>
+  <span class="code-property">name</span>: <span class="code-string">'string!'</span>,
+  
+  <span class="code-comment">// Optional number</span>
+  <span class="code-property">age</span>: <span class="code-string">'number?'</span>,
+  
+  <span class="code-comment">// Boolean with default value</span>
+  <span class="code-property">isActive</span>: <span class="code-string">'boolean+'</span>,
+  
+  <span class="code-comment">// Array of strings</span>
+  <span class="code-property">tags</span>: [<span class="code-string">'string'</span>],
+  
+  <span class="code-comment">// Object with nested properties</span>
+  <span class="code-property">address</span>: {
+    <span class="code-property">street</span>: <span class="code-string">'string!'</span>,
+    <span class="code-property">city</span>: <span class="code-string">'string!'</span>,
+    <span class="code-property">country</span>: <span class="code-string">'string!'</span>
+  }
+};</code>
+                        </div>
+                    </div>
+                    
+                    <div id="schema-advanced" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Advanced schema with validations</span>
+<span class="code-keyword">const</span> productSchema = {
+  <span class="code-property">name</span>: { 
+    <span class="code-property">type</span>: <span class="code-string">'string'</span>, 
+    <span class="code-property">required</span>: <span class="code-keyword">true</span>,
+    <span class="code-property">minlength</span>: [<span class="code-number">3</span>, <span class="code-string">'Name must be at least 3 characters'</span>],
+    <span class="code-property">maxlength</span>: [<span class="code-number">50</span>, <span class="code-string">'Name cannot exceed 50 characters'</span>]
+  },
+  
+  <span class="code-property">price</span>: { 
+    <span class="code-property">type</span>: <span class="code-string">'number'</span>, 
+    <span class="code-property">required</span>: <span class="code-keyword">true</span>,
+    <span class="code-property">min</span>: [<span class="code-number">0</span>, <span class="code-string">'Price cannot be negative'</span>]
+  },
+  
+  <span class="code-property">category</span>: {
+    <span class="code-property">type</span>: <span class="code-string">'string'</span>,
+    <span class="code-property">enum</span>: [<span class="code-string">'Electronics'</span>, <span class="code-string">'Clothing'</span>, <span class="code-string">'Books'</span>],
+    <span class="code-property">default</span>: <span class="code-string">'Electronics'</span>
+  },
+  
+  <span class="code-property">inStock</span>: { 
+    <span class="code-property">type</span>: <span class="code-string">'boolean'</span>, 
+    <span class="code-property">default</span>: <span class="code-keyword">true</span> 
+  }
+};</code>
+                        </div>
+                    </div>
+                    
+                    <div id="schema-shortcuts" class="tab-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Shortcut</th>
+                                    <th>Description</th>
+                                    <th>Equivalent To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>'string!'</code></td>
+                                    <td>Required string</td>
+                                    <td><code>{ type: String, required: true }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'number?'</code></td>
+                                    <td>Optional number</td>
+                                    <td><code>Number</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'boolean+'</code></td>
+                                    <td>Boolean with default false</td>
+                                    <td><code>{ type: Boolean, default: false }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'email'</code></td>
+                                    <td>Email with validation</td>
+                                    <td><code>{ type: String, required: true, match: emailRegex }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'password'</code></td>
+                                    <td>Password with min length</td>
+                                    <td><code>{ type: String, required: true, minlength: 6 }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'url'</code></td>
+                                    <td>URL with validation</td>
+                                    <td><code>{ type: String, match: urlRegex }</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>'userRef'</code></td>
+                                    <td>Reference to User model</td>
+                                    <td><code>{ type: ObjectId, ref: 'User' }</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Models -->
+        <section id="models" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-cube"></i> Models</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Create models with automatic features and enhancements:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// Create a model</span>
+<span class="code-keyword">const</span> User = mongoo.model(<span class="code-string">'User'</span>, {
+  <span class="code-property">firstName</span>: <span class="code-string">'string!'</span>,
+  <span class="code-property">lastName</span>: <span class="code-string">'string!'</span>,
+  <span class="code-property">email</span>: <span class="code-string">'email'</span>,
+  <span class="code-property">birthDate</span>: <span class="code-string">'date?'</span>
+});
+
+<span class="code-comment">// Get existing model</span>
+<span class="code-keyword">const</span> User = mongoo.getModel(<span class="code-string">'User'</span>);
+
+<span class="code-comment">// Use predefined template</span>
+<span class="code-keyword">const</span> User = mongoo.model(<span class="code-string">'User'</span>, mongoo.templates.user);</code>
+                    </div>
+                    
+                    <h4>Auto-Features Included:</h4>
+                    <ul>
+                        <li><strong>Timestamps:</strong> Automatic createdAt and updatedAt fields</li>
+                        <li><strong>Indexes:</strong> Auto-indexing for common fields</li>
+                        <li><strong>Virtuals:</strong> Automatic virtual fields (fullName, age, etc.)</li>
+                        <li><strong>Middleware:</strong> Auto-hooks for common operations</li>
+                        <li><strong>Validation:</strong> Smart validation with friendly messages</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CRUD Operations -->
+        <section id="crud" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-tasks"></i> CRUD Operations</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Complete CRUD operations with simplified syntax:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'crud-create')">Create</div>
+                        <div class="tab" onclick="openTab(event, 'crud-read')">Read</div>
+                        <div class="tab" onclick="openTab(event, 'crud-update')">Update</div>
+                        <div class="tab" onclick="openTab(event, 'crud-delete')">Delete</div>
+                    </div>
+                    
+                    <div id="crud-create" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Create a single document</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
+  <span class="code-property">name</span>: <span class="code-string">'Alice'</span>,
+  <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span>,
+  <span class="code-property">age</span>: <span class="code-number">28</span>
+});
+
+<span class="code-comment">// Create multiple documents</span>
+<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> User.create([
+  { <span class="code-property">name</span>: <span class="code-string">'Bob'</span>, <span class="code-property">email</span>: <span class="code-string">'bob@example.com'</span> },
+  { <span class="code-property">name</span>: <span class="code-string">'Charlie'</span>, <span class="code-property">email</span>: <span class="code-string">'charlie@example.com'</span> }
+]);
+
+<span class="code-comment">// Find or create</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findOrCreate(<span class="code-string">'User'</span>, 
+  { <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span> },
+  { <span class="code-property">name</span>: <span class="code-string">'Alice'</span>, <span class="code-property">age</span>: <span class="code-number">28</span> }
+);</code>
+                        </div>
+                    </div>
+                    
+                    <div id="crud-read" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Find all documents</span>
+<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>);
+
+<span class="code-comment">// Find with filter</span>
+<span class="code-keyword">const</span> activeUsers = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>, { 
+  <span class="code-property">isActive</span>: <span class="code-keyword">true</span>,
+  <span class="code-property">age</span>: { <span class="code-operator">$gte</span>: <span class="code-number">18</span> }
+});
+
+<span class="code-comment">// Find one document</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findOne(<span class="code-string">'User'</span>, { 
+  <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span> 
+});
+
+<span class="code-comment">// Find by ID</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'507f1f77bcf86cd799439011'</span>);
+
+<span class="code-comment">// Find with options</span>
+<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>, {}, {
+  <span class="code-property">sort</span>: { <span class="code-property">createdAt</span>: -<span class="code-number">1</span> },
+  <span class="code-property">limit</span>: <span class="code-number">10</span>,
+  <span class="code-property">select</span>: <span class="code-string">'name email'</span>,
+  <span class="code-property">populate</span>: <span class="code-string">'posts'</span>
+});</code>
+                        </div>
+                    </div>
+                    
+                    <div id="crud-update" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Update multiple documents</span>
+<span class="code-keyword">await</span> mongoo.update(<span class="code-string">'User'</span>, 
+  { <span class="code-property">isActive</span>: <span class="code-keyword">false</span> }, 
+  { <span class="code-property">status</span>: <span class="code-string">'inactive'</span> }
+);
+
+<span class="code-comment">// Update by ID</span>
+<span class="code-keyword">const</span> updatedUser = <span class="code-keyword">await</span> mongoo.updateById(
+  <span class="code-string">'User'</span>, 
+  <span class="code-string">'507f1f77bcf86cd799439011'</span>,
+  { <span class="code-property">age</span>: <span class="code-number">29</span>, <span class="code-property">lastLogin</span>: <span class="code-keyword">new</span> Date() }
+);
+
+<span class="code-comment">// Save (create or update)</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.save(<span class="code-string">'User'</span>, {
+  <span class="code-property">_id</span>: <span class="code-string">'507f1f77bcf86cd799439011'</span>, <span class="code-comment">// If provided, updates existing</span>
+  <span class="code-property">name</span>: <span class="code-string">'Alice Updated'</span>,
+  <span class="code-property">email</span>: <span class="code-string">'alice.updated@example.com'</span>
+});</code>
+                        </div>
+                    </div>
+                    
+                    <div id="crud-delete" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Delete multiple documents</span>
+<span class="code-keyword">await</span> mongoo.delete(<span class="code-string">'User'</span>, { 
+  <span class="code-property">isActive</span>: <span class="code-keyword">false</span> 
+});
+
+<span class="code-comment">// Delete by ID</span>
+<span class="code-keyword">await</span> mongoo.deleteById(<span class="code-string">'User'</span>, <span class="code-string">'507f1f77bcf86cd799439011'</span>);
+
+<span class="code-comment">// Check if document exists</span>
+<span class="code-keyword">const</span> exists = <span class="code-keyword">await</span> mongoo.exists(<span class="code-string">'User'</span>, { 
+  <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span> 
+});
+
+<span class="code-comment">// Count documents</span>
+<span class="code-keyword">const</span> count = <span class="code-keyword">await</span> mongoo.count(<span class="code-string">'User'</span>, { 
+  <span class="code-property">isActive</span>: <span class="code-keyword">true</span> 
+});</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- More sections would continue here... -->
+
+        <!-- Schema Designer Button -->
+        <a href="/schema-design.html" class="schema-designer-btn">
+            <i class="fas fa-palette"></i>
+            <span>New</span>
+        </a>
     </div>
 
     <script>
-        let schemas = [];
-        let selectedSchema = null;
-        let draggedSchema = null;
-        let dragOffset = { x: 0, y: 0 };
-        let isPanning = false;
-        let panStart = { x: 0, y: 0 };
-        let canvasOffset = { x: 0, y: 0 };
-        let zoom = 1;
-        let schemaIdCounter = 0;
-        let highlightedField = null;
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
 
-        const canvas = document.getElementById('canvas');
-        const canvasContainer = document.getElementById('canvasContainer');
-        const connectionsSvg = document.getElementById('connectionsSvg');
-
-        const fieldTypes = [
-            'String', 'Number', 'Boolean', 'Date', 'ObjectId',
-            'Array', 'Mixed', 'Buffer', 'Decimal128', 'Map'
-        ];
-
-        const fieldColors = {
-            'String': '#58a6ff',
-            'Number': '#3fb950',
-            'Boolean': '#d29922',
-            'Date': '#bc8cff',
-            'ObjectId': '#f85149',
-            'Array': '#79c0ff',
-            'Mixed': '#ffa657',
-            'Buffer': '#d2a8ff',
-            'Decimal128': '#56d364',
-            'Map': '#ff7b72'
-        };
-
-        function addSchema(x = 100, y = 100) {
-            const schema = {
-                id: schemaIdCounter++,
-                name: `Schema${schemaIdCounter}`,
-                x: x,
-                y: y,
-                timestamps: false,
-                fields: [
-                    {
-                        name: '_id',
-                        type: 'ObjectId',
-                        required: true,
-                        unique: true,
-                        ref: '',
-                        default: ''
-                    }
-                ]
-            };
-
-            schemas.push(schema);
-            renderSchema(schema);
-            updateConnections();
-        }
-
-        function renderSchema(schema) {
-            const box = document.createElement('div');
-            box.className = 'schema-box';
-            box.id = `schema-${schema.id}`;
-            box.style.left = schema.x + 'px';
-            box.style.top = schema.y + 'px';
-
-            box.innerHTML = `
-                <div class="schema-header">
-                    <input type="text" value="${schema.name}" onchange="updateSchemaName(${schema.id}, this.value)">
-                    <button class="delete-btn" onclick="deleteSchema(${schema.id})">×</button>
-                </div>
-                <div class="schema-body" id="schema-body-${schema.id}">
-                    ${renderFields(schema)}
-                    <button class="add-field-btn" onclick="addField(${schema.id})">+ Add Field</button>
-                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schema.id})">
-                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                    </button>
-                </div>
-            `;
-
-            // Make schema draggable
-            const header = box.querySelector('.schema-header');
-            header.addEventListener('mousedown', startDrag);
-
-            function startDrag(e) {
-                if (e.button !== 0) return; // Only left click
-                selectedSchema = schema;
-                draggedSchema = schema;
-                
-                document.querySelectorAll('.schema-box').forEach(b => b.classList.remove('selected'));
-                box.classList.add('selected');
-                
-                const rect = box.getBoundingClientRect();
-                dragOffset.x = e.clientX - rect.left;
-                dragOffset.y = e.clientY - rect.top;
-                
-                e.preventDefault();
-            }
-
-            canvas.appendChild(box);
-        }
-
-        function renderFields(schema) {
-            return schema.fields.map((field, index) => {
-                const showRef = field.type === 'ObjectId' || (field.type === 'Array' && field.ref);
-                return `
-                <div class="field-item" id="field-${schema.id}-${index}" 
-                     onclick="highlightFieldConnections(${schema.id}, ${index})"
-                     style="border-left: 3px solid ${fieldColors[field.type] || '#30363d'}">
-                    <div class="field-main-row">
-                        <input type="text" value="${field.name}" placeholder="Field name" 
-                               onchange="updateField(${schema.id}, ${index}, 'name', this.value)">
-                        <select onchange="updateField(${schema.id}, ${index}, 'type', this.value)">
-                            ${fieldTypes.map(type => `
-                                <option value="${type}" ${field.type === type ? 'selected' : ''}>${type}</option>
-                            `).join('')}
-                        </select>
-                        ${field.name !== '_id' ? `<button class="remove-field" onclick="event.stopPropagation(); removeField(${schema.id}, ${index})">×</button>` : '<span></span>'}
-                    </div>
-                    
-                    <div class="field-options-dropdown">
-                        <div class="field-options-header" onclick="event.stopPropagation(); toggleFieldOptions(${schema.id}, ${index})">
-                            <span>Field Options</span>
-                            <span id="field-options-arrow-${schema.id}-${index}">▶</span>
-                        </div>
-                        <div class="field-options-content collapsed" id="field-options-${schema.id}-${index}">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="req-${schema.id}-${index}" 
-                                       ${field.required ? 'checked' : ''}
-                                       onchange="updateField(${schema.id}, ${index}, 'required', this.checked)">
-                                <label for="req-${schema.id}-${index}">Required</label>
-                            </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="uniq-${schema.id}-${index}" 
-                                       ${field.unique ? 'checked' : ''}
-                                       onchange="updateField(${schema.id}, ${index}, 'unique', this.checked)">
-                                <label for="uniq-${schema.id}-${index}">Unique</label>
-                            </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="index-${schema.id}-${index}" 
-                                       ${field.index ? 'checked' : ''}
-                                       onchange="updateField(${schema.id}, ${index}, 'index', this.checked)">
-                                <label for="index-${schema.id}-${index}">Indexed</label>
-                            </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="sparse-${schema.id}-${index}" 
-                                       ${field.sparse ? 'checked' : ''}
-                                       onchange="updateField(${schema.id}, ${index}, 'sparse', this.checked)">
-                                <label for="sparse-${schema.id}-${index}">Sparse</label>
-                            </div>
-                            ${showRef ? `
-                            <select class="ref-select" style="grid-column: 1 / -1;" onchange="updateField(${schema.id}, ${index}, 'ref', this.value)">
-                                <option value="">No Reference</option>
-                                ${schemas.filter(s => s.id !== schema.id).map(s => `
-                                    <option value="${s.name}" ${field.ref === s.name ? 'selected' : ''}>${s.name}</option>
-                                `).join('')}
-                            </select>` : ''}
-                            <input type="text" style="grid-column: 1 / -1;" placeholder="Default value" 
-                                   value="${field.default || ''}"
-                                   onchange="updateField(${schema.id}, ${index}, 'default', this.value)">
-                        </div>
-                    </div>
-                </div>
-            `;
-            }).join('');
-        }
-        function toggleFieldOptions(schemaId, fieldIndex) {
-            const optionsContent = document.getElementById(`field-options-${schemaId}-${fieldIndex}`);
-            const arrow = document.getElementById(`field-options-arrow-${schemaId}-${fieldIndex}`);
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const textArea = document.createElement('textarea');
+            textArea.value = codeBlock.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
             
-            if (optionsContent.classList.contains('collapsed')) {
-                optionsContent.classList.remove('collapsed');
-                arrow.textContent = '▼';
-            } else {
-                optionsContent.classList.add('collapsed');
-                arrow.textContent = '▶';
+            // Visual feedback
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
             }
-        }
-
-        function updateSchemaName(id, name) {
-            const schema = schemas.find(s => s.id === id);
-            if (schema) {
-                schema.name = name;
-                // Update all references to this schema
-                schemas.forEach(s => {
-                    s.fields.forEach(f => {
-                        if (f.ref === schema.name) {
-                            const body = document.getElementById(`schema-body-${s.id}`);
-                            if (body) {
-                                body.innerHTML = renderFields(s) +
-                                    `<button class="add-field-btn" onclick="addField(${s.id})">+ Add Field</button>
-                                    <button class="timestamp-toggle ${s.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${s.id})">
-                                        ${s.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                                    </button>`;
-                            }
-                        }
-                    });
-                });
-                updateConnections();
+            
+            const tablinks = document.getElementsByClassName('tab');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
             }
+            
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
 
-        function addField(schemaId) {
-            const schema = schemas.find(s => s.id === schemaId);
-            if (schema) {
-                schema.fields.push({
-                    name: 'newField',
-                    type: 'String',
-                    required: false,
-                    unique: false,
-                    index: false,
-                    sparse: false,
-                    ref: '',
-                    default: ''
-                });
-                const body = document.getElementById(`schema-body-${schemaId}`);
-                body.innerHTML = renderFields(schema) +
-                    `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
-                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
-                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                    </button>`;
-                updateConnections();
-            }
-        }
-
-        function updateField(schemaId, fieldIndex, prop, value) {
-            const schema = schemas.find(s => s.id === schemaId);
-            if (schema && schema.fields[fieldIndex]) {
-                schema.fields[fieldIndex][prop] = value;
-
-                if (prop === 'type' || prop === 'ref') {
-                    const body = document.getElementById(`schema-body-${schemaId}`);
-                    body.innerHTML = renderFields(schema) +
-                        `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
-                        <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
-                            ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                        </button>`;
-                    updateConnections();
-                }
-            }
-        }
-
-        function removeField(schemaId, fieldIndex) {
-            const schema = schemas.find(s => s.id === schemaId);
-            if (schema) {
-                schema.fields.splice(fieldIndex, 1);
-                const body = document.getElementById(`schema-body-${schemaId}`);
-                body.innerHTML = renderFields(schema) +
-                    `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
-                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
-                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                    </button>`;
-                updateConnections();
-            }
-        }
-
-        function toggleTimestamps(schemaId) {
-            const schema = schemas.find(s => s.id === schemaId);
-            if (schema) {
-                schema.timestamps = !schema.timestamps;
-                const body = document.getElementById(`schema-body-${schemaId}`);
-                body.innerHTML = renderFields(schema) +
-                    `<button class="add-field-btn" onclick="addField(${schemaId})">+ Add Field</button>
-                    <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schemaId})">
-                        ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                    </button>`;
-            }
-        }
-
-        function deleteSchema(id) {
-            schemas = schemas.filter(s => s.id !== id);
-            const box = document.getElementById(`schema-${id}`);
-            if (box) box.remove();
-            updateConnections();
-        }
-
-        function clearCanvas() {
-            if (confirm('Are you sure you want to clear all schemas?')) {
-                schemas = [];
-                canvas.innerHTML = '<svg class="connections-svg" id="connectionsSvg"></svg>';
-            }
-        }
-
-        function highlightFieldConnections(schemaId, fieldIndex) {
-            const schema = schemas.find(s => s.id === schemaId);
-            const field = schema.fields[fieldIndex];
-
-            // Clear previous highlights
-            document.querySelectorAll('.field-item').forEach(el => el.classList.remove('highlighted'));
-            document.querySelectorAll('.connection-line').forEach(el => el.classList.remove('highlighted'));
-
-            if (highlightedField && highlightedField.schemaId === schemaId && highlightedField.fieldIndex === fieldIndex) {
-                highlightedField = null;
-                return;
-            }
-
-            highlightedField = { schemaId, fieldIndex };
-
-            // Highlight current field
-            const currentFieldEl = document.getElementById(`field-${schemaId}-${fieldIndex}`);
-            if (currentFieldEl) currentFieldEl.classList.add('highlighted');
-
-            // Find and highlight all connected fields
-            schemas.forEach(s => {
-                s.fields.forEach((f, fIdx) => {
-                    if (f.ref === schema.name) {
-                        const fieldEl = document.getElementById(`field-${s.id}-${fIdx}`);
-                        if (fieldEl) fieldEl.classList.add('highlighted');
-
-                        // Highlight connection line
-                        const lineId = `line-${s.id}-${fIdx}`;
-                        const line = document.getElementById(lineId);
-                        if (line) line.classList.add('highlighted');
-                    }
-                });
-            });
-
-            // Highlight connections from this field
-            if (field.ref) {
-                const targetSchema = schemas.find(s => s.name === field.ref);
-                if (targetSchema) {
-                    const lineId = `line-${schemaId}-${fieldIndex}`;
-                    const line = document.getElementById(lineId);
-                    if (line) line.classList.add('highlighted');
-                }
-            }
-        }
-
-        function updateConnections() {
-            connectionsSvg.innerHTML = '';
-
-            schemas.forEach(schema => {
-                schema.fields.forEach((field, fieldIndex) => {
-                    if (field.ref) {
-                        const targetSchema = schemas.find(s => s.name === field.ref);
-                        if (targetSchema) {
-                            const sourceBox = document.getElementById(`schema-${schema.id}`);
-                            const targetBox = document.getElementById(`schema-${targetSchema.id}`);
-
-                            if (sourceBox && targetBox) {
-                                // Get positions relative to canvas (not viewport)
-                                const sourceX = schema.x + sourceBox.offsetWidth / 2;
-                                const sourceY = schema.y + sourceBox.offsetHeight / 2;
-                                
-                                const targetX = targetSchema.x + targetBox.offsetWidth / 2;
-                                const targetY = targetSchema.y + targetBox.offsetHeight / 2;
-
-                                // Create curved path
-                                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                                const midX = (sourceX + targetX) / 2;
-                                const d = `M ${sourceX} ${sourceY} C ${midX} ${sourceY}, ${midX} ${targetY}, ${targetX} ${targetY}`;
-
-                                path.setAttribute('d', d);
-                                path.setAttribute('class', 'connection-line');
-                                path.setAttribute('id', `line-${schema.id}-${fieldIndex}`);
-                                path.setAttribute('stroke', fieldColors[field.type] || '#58a6ff');
-                                path.onclick = () => highlightFieldConnections(schema.id, fieldIndex);
-
-                                connectionsSvg.appendChild(path);
-                            }
-                        }
-                    }
-                });
-            });
-        }
-
-        function exportSchema() {
-            const json = JSON.stringify(schemas.map(s => ({
-                name: s.name,
-                timestamps: s.timestamps,
-                fields: s.fields.map(f => ({
-                    name: f.name,
-                    type: f.type,
-                    required: f.required,
-                    unique: f.unique,
-                    index: f.index,
-                    sparse: f.sparse,
-                    ref: f.ref,
-                    default: f.default
-                }))
-            })), null, 2);
-
-            document.getElementById('exportContent').textContent = json;
-            document.getElementById('exportModal').classList.add('active');
-        }
-
-        function exportMongoose() {
-            let code = "const mongoose = require('mongoose');\nconst Schema = mongoose.Schema;\n\n";
-
-            schemas.forEach(schema => {
-                code += `const ${schema.name}Schema = new Schema({\n`;
-                schema.fields.forEach((field, index) => {
-                    if (field.name !== '_id') {
-                        code += `  ${field.name}: {\n`;
-                        code += `    type: ${field.type === 'ObjectId' ? 'Schema.Types.ObjectId' : field.type},\n`;
-                        if (field.required) code += `    required: true,\n`;
-                        if (field.unique) code += `    unique: true,\n`;
-                        if (field.index) code += `    index: true,\n`;
-                        if (field.sparse) code += `    sparse: true,\n`;
-                        if (field.ref) code += `    ref: '${field.ref}',\n`;
-                        if (field.default) {
-                            if (field.type === 'String' || field.type === 'Date') {
-                                code += `    default: '${field.default}',\n`;
-                            } else if (field.type === 'Boolean') {
-                                code += `    default: ${field.default.toLowerCase() === 'true'},\n`;
-                            } else {
-                                code += `    default: ${field.default},\n`;
-                            }
-                        }
-                        // Remove trailing comma
-                        code = code.replace(/,\n$/, '\n');
-                        code += `  },\n`;
-                    }
-                });
-                code += `}${schema.timestamps ? ', { timestamps: true }' : ''});\n\n`;
-                code += `const ${schema.name} = mongoose.model('${schema.name}', ${schema.name}Schema);\n\n`;
-            });
-
-            code += `module.exports = { ${schemas.map(s => s.name).join(', ')} };`;
-
-            document.getElementById('exportContent').textContent = code;
-            document.getElementById('exportModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('exportModal').classList.remove('active');
-        }
-
-        function zoomIn() {
-            zoom = Math.min(zoom + 0.1, 2);
-            updateZoom();
-        }
-
-        function zoomOut() {
-            zoom = Math.max(zoom - 0.1, 0.5);
-            updateZoom();
-        }
-
-        function updateZoom() {
-            canvas.style.transform = `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`;
-            document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
-            updateConnections();
-        }
-
-        function resetView() {
-            zoom = 1;
-            canvasOffset = { x: 0, y: 0 };
-            updateZoom();
-        }
-
-        // Mouse events for dragging schemas
-        document.addEventListener('mousemove', (e) => {
-            if (draggedSchema) {
-                const schema = draggedSchema;
-                
-                // Calculate new position considering zoom and canvas offset
-                const newX = (e.clientX - canvas.getBoundingClientRect().left - canvasOffset.x) / zoom - dragOffset.x;
-                const newY = (e.clientY - canvas.getBoundingClientRect().top - canvasOffset.y) / zoom - dragOffset.y;
-                
-                schema.x = Math.max(0, newX);
-                schema.y = Math.max(0, newY);
-
-                const box = document.getElementById(`schema-${schema.id}`);
-                if (box) {
-                    box.style.left = schema.x + 'px';
-                    box.style.top = schema.y + 'px';
-                }
-                updateConnections();
-            } else if (isPanning) {
-                canvasOffset.x = e.clientX - panStart.x;
-                canvasOffset.y = e.clientY - panStart.y;
-                updateZoom();
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            draggedSchema = null;
-            isPanning = false;
-            canvasContainer.classList.remove('grabbing');
-        });
-
-        // Canvas panning
-        canvasContainer.addEventListener('mousedown', (e) => {
-            if (e.target === canvasContainer || e.target === canvas || e.target === connectionsSvg) {
-                isPanning = true;
-                panStart.x = e.clientX - canvasOffset.x;
-                panStart.y = e.clientY - canvasOffset.y;
-                canvasContainer.classList.add('grabbing');
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-            }
-        });
-
-        // Zoom with mouse wheel
-        canvasContainer.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            if (e.deltaY < 0) {
-                zoom = Math.min(zoom + 0.05, 2);
-            } else {
-                zoom = Math.max(zoom - 0.05, 0.5);
-            }
-            updateZoom();
-        });
-
-        // Custom context menu
-        canvasContainer.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-
-            const existingMenu = document.querySelector('.context-menu');
-            if (existingMenu) existingMenu.remove();
-
-            const menu = document.createElement('div');
-            menu.className = 'context-menu';
-            menu.style.left = e.clientX + 'px';
-            menu.style.top = e.clientY + 'px';
-
-            const rect = canvasContainer.getBoundingClientRect();
-            const canvasX = (e.clientX - rect.left - canvasOffset.x) / zoom;
-            const canvasY = (e.clientY - rect.top - canvasOffset.y) / zoom;
-
-            menu.innerHTML = `
-                <div class="context-menu-item" onclick="addSchema(${canvasX}, ${canvasY}); closeContextMenu()">
-                    ➕ New Schema
-                </div>
-                <div class="context-menu-separator"></div>
-                <div class="context-menu-item" onclick="resetView(); closeContextMenu()">
-                    🎯 Reset View
-                </div>
-                <div class="context-menu-item" onclick="exportSchema(); closeContextMenu()">
-                    📄 Export JSON
-                </div>
-                <div class="context-menu-item" onclick="exportMongoose(); closeContextMenu()">
-                    🚀 Export Mongoose
-                </div>
-                <div class="context-menu-separator"></div>
-                <div class="context-menu-item" onclick="clearCanvas(); closeContextMenu()">
-                    🗑️ Clear All
-                </div>
-            `;
-
-            document.body.appendChild(menu);
-        });
-
-        function closeContextMenu() {
-            const menu = document.querySelector('.context-menu');
-            if (menu) menu.remove();
-        }
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.context-menu')) {
-                closeContextMenu();
-            }
-        });
-
-        // Click outside to deselect
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.schema-box') && !e.target.closest('.connection-line')) {
-                document.querySelectorAll('.field-item').forEach(el => el.classList.remove('highlighted'));
-                document.querySelectorAll('.connection-line').forEach(el => el.classList.remove('highlighted'));
-                highlightedField = null;
-            }
-        });
-
-        // Initialize with two connected schemas
-        addSchema(150, 150);
-        addSchema(550, 150);
-
-        // Add a reference field to demonstrate connections
-        setTimeout(() => {
-            if (schemas.length >= 2) {
-                const schema = schemas[1];
-                schema.fields.push({
-                    name: 'userId',
-                    type: 'ObjectId',
-                    required: true,
-                    unique: false,
-                    index: true,
-                    sparse: false,
-                    ref: schemas[0].name,
-                    default: ''
-                });
-                const body = document.getElementById(`schema-body-${schema.id}`);
-                if (body) {
-                    body.innerHTML = renderFields(schema) +
-                        `<button class="add-field-btn" onclick="addField(${schema.id})">+ Add Field</button>
-                        <button class="timestamp-toggle ${schema.timestamps ? 'active' : ''}" onclick="toggleTimestamps(${schema.id})">
-                            ${schema.timestamps ? '✓ Timestamps Enabled' : 'Enable Timestamps'}
-                        </button>`;
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    document.getElementById('sidebar').classList.remove('active');
                 }
-                updateConnections();
-            }
-        }, 100);
+            });
+        });
+
+        // Update active nav link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
-
 </html>
