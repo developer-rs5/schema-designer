@@ -3,8 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy-Mongoo - Complete Documentation</title>
+    <title>Easy-Mongoo - Complete MongoDB Wrapper Documentation | Ultra-Simple MongoDB Operations</title>
+    <meta name="description" content="Complete documentation for Easy-Mongoo - the ultra-simple MongoDB wrapper with all Mongoose features. Learn schema creation, CRUD operations, transactions, aggregation and more with beginner-friendly examples.">
+    <meta name="keywords" content="easy-mongoo, mongodb, mongoose, nodejs, database, crud, schema, transactions, aggregation, documentation">
+    <meta name="author" content="Easy-Mongoo Team">
+    <meta property="og:title" content="Easy-Mongoo - Complete MongoDB Wrapper Documentation">
+    <meta property="og:description" content="Ultra-simple MongoDB wrapper with all Mongoose features in easy syntax">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Easy-Mongoo",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Node.js",
+      "description": "Ultra-simple MongoDB wrapper with all Mongoose features in easy syntax",
+      "keywords": "mongodb, mongoose, nodejs, database, wrapper",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
     <style>
         :root {
             --primary: #8b5cf6;
@@ -472,6 +494,7 @@
             display: flex;
             border-bottom: 1px solid var(--border);
             margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
 
         .tab {
@@ -480,6 +503,7 @@
             border-bottom: 3px solid transparent;
             transition: all 0.2s;
             color: var(--gray);
+            white-space: nowrap;
         }
 
         .tab.active {
@@ -538,6 +562,38 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--gray);
         }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Feature Badge */
+        .feature-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -581,6 +637,14 @@
                     <li><a href="#transactions">Transactions</a></li>
                     <li><a href="#aggregation">Aggregation</a></li>
                     <li><a href="#indexes">Indexes</a></li>
+                    <li><a href="#plugins">Plugins</a></li>
+                    <li><a href="#discriminators">Discriminators</a></li>
+                    <li><a href="#geospatial">Geospatial Queries</a></li>
+                    <li><a href="#text-search">Text Search</a></li>
+                    <li><a href="#bulk-operations">Bulk Operations</a></li>
+                    <li><a href="#pagination">Pagination</a></li>
+                    <li><a href="#caching">Caching</a></li>
+                    <li><a href="#migration">Data Migration</a></li>
                 </ul>
             </div>
             
@@ -608,6 +672,12 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="#">Home</a> <i class="fas fa-chevron-right"></i>
+            <span>Easy-Mongoo Documentation</span>
+        </div>
+
         <!-- Hero Section -->
         <section class="hero">
             <h1>Easy-Mongoo</h1>
@@ -1110,7 +1180,490 @@ mongoo.model(<span class="code-string">'User'</span>, {
             </div>
         </section>
 
-        <!-- More sections would continue here... -->
+        <!-- Virtual Fields -->
+        <section id="virtuals" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-ghost"></i> Virtual Fields <span class="feature-badge">NEW</span></h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Virtual fields are computed properties that don't get stored in MongoDB:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// Auto virtuals (already included)</span>
+<span class="code-comment">// - fullName (if firstName and lastName exist)</span>
+<span class="code-comment">// - age (if birthDate exists)</span>
+<span class="code-comment">// - createdAtFormatted</span>
+
+<span class="code-comment">// Custom virtual field</span>
+mongoo.virtual(<span class="code-string">'User'</span>, <span class="code-string">'profileUrl'</span>, <span class="code-keyword">function</span>() {
+  <span class="code-keyword">return</span> <span class="code-string">`/users/</span><span class="code-function">${</span><span class="code-keyword">this</span>.slug <span class="code-operator">||</span> <span class="code-keyword">this</span>._id<span class="code-function">}</span><span class="code-string">`</span>;
+});
+
+<span class="code-comment">// Virtual with setter</span>
+mongoo.virtual(<span class="code-string">'User'</span>, <span class="code-string">'fullName'</span>, 
+  <span class="code-comment">// Getter</span>
+  <span class="code-keyword">function</span>() {
+    <span class="code-keyword">return</span> <span class="code-string">`</span><span class="code-function">${</span><span class="code-keyword">this</span>.firstName<span class="code-function">}</span><span class="code-string"> </span><span class="code-function">${</span><span class="code-keyword">this</span>.lastName<span class="code-function">}</span><span class="code-string">`</span>;
+  },
+  <span class="code-comment">// Setter</span>
+  <span class="code-keyword">function</span>(value) {
+    <span class="code-keyword">const</span> parts = value.split(<span class="code-string">' '</span>);
+    <span class="code-keyword">this</span>.firstName = parts[<span class="code-number">0</span>];
+    <span class="code-keyword">this</span>.lastName = parts.slice(<span class="code-number">1</span>).join(<span class="code-string">' '</span>);
+  }
+);
+
+<span class="code-comment">// Usage</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'...'</span>);
+<span class="code-function">console</span>.log(user.fullName); <span class="code-comment">// Computed property</span>
+<span class="code-function">console</span>.log(user.profileUrl); <span class="code-comment">// Custom virtual</span></code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Methods & Statics -->
+        <section id="methods" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Methods & Statics</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Add custom instance methods and static methods to your models:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'methods-instance')">Instance Methods</div>
+                        <div class="tab" onclick="openTab(event, 'methods-static')">Static Methods</div>
+                        <div class="tab" onclick="openTab(event, 'methods-query')">Query Helpers</div>
+                    </div>
+                    
+                    <div id="methods-instance" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Add instance method</span>
+mongoo.method(<span class="code-string">'User'</span>, <span class="code-string">'getProfile'</span>, <span class="code-keyword">function</span>() {
+  <span class="code-keyword">return</span> {
+    <span class="code-property">name</span>: <span class="code-keyword">this</span>.name,
+    <span class="code-property">email</span>: <span class="code-keyword">this</span>.email,
+    <span class="code-property">memberSince</span>: <span class="code-keyword">this</span>.createdAt,
+    <span class="code-property">profileUrl</span>: <span class="code-string">`/users/</span><span class="code-function">${</span><span class="code-keyword">this</span>._id<span class="code-function">}</span><span class="code-string">`</span>
+  };
+});
+
+<span class="code-comment">// Instance method with async operations</span>
+mongoo.method(<span class="code-string">'User'</span>, <span class="code-string">'deactivate'</span>, <span class="code-keyword">async function</span>(reason) {
+  <span class="code-keyword">this</span>.isActive = <span class="code-keyword">false</span>;
+  <span class="code-keyword">this</span>.deactivationReason = reason;
+  <span class="code-keyword">this</span>.deactivatedAt = <span class="code-keyword">new</span> Date();
+  <span class="code-keyword">return await</span> <span class="code-keyword">this</span>.save();
+});
+
+<span class="code-comment">// Usage</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'...'</span>);
+<span class="code-keyword">const</span> profile = user.getProfile();
+<span class="code-keyword">await</span> user.deactivate(<span class="code-string">'User requested'</span>);</code>
+                        </div>
+                    </div>
+                    
+                    <div id="methods-static" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Add static method</span>
+mongoo.static(<span class="code-string">'User'</span>, <span class="code-string">'findByEmail'</span>, <span class="code-keyword">async function</span>(email) {
+  <span class="code-keyword">return await</span> <span class="code-keyword">this</span>.findOne({ email }).populate(<span class="code-string">'posts'</span>);
+});
+
+<span class="code-comment">// Static method with complex logic</span>
+mongoo.static(<span class="code-string">'User'</span>, <span class="code-string">'getActiveStats'</span>, <span class="code-keyword">async function</span>() {
+  <span class="code-keyword">const</span> stats = <span class="code-keyword">await</span> <span class="code-keyword">this</span>.aggregate([
+    { <span class="code-property">$match</span>: { <span class="code-property">isActive</span>: <span class="code-keyword">true</span> } },
+    { <span class="code-property">$group</span>: {
+        <span class="code-property">_id</span>: <span class="code-keyword">null</span>,
+        <span class="code-property">total</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> },
+        <span class="code-property">avgAge</span>: { <span class="code-property">$avg</span>: <span class="code-string">'$age'</span> },
+        <span class="code-property">maxAge</span>: { <span class="code-property">$max</span>: <span class="code-string">'$age'</span> },
+        <span class="code-property">minAge</span>: { <span class="code-property">$min</span>: <span class="code-string">'$age'</span> }
+    }}
+  ]);
+  <span class="code-keyword">return</span> stats[<span class="code-number">0</span>] <span class="code-operator">||</span> {};
+});
+
+<span class="code-comment">// Usage</span>
+<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.getModel(<span class="code-string">'User'</span>).findByEmail(<span class="code-string">'alice@example.com'</span>);
+<span class="code-keyword">const</span> stats = <span class="code-keyword">await</span> mongoo.getModel(<span class="code-string">'User'</span>).getActiveStats();</code>
+                        </div>
+                    </div>
+                    
+                    <div id="methods-query" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Add query helper</span>
+mongoo.query(<span class="code-string">'User'</span>, <span class="code-string">'byAgeRange'</span>, <span class="code-keyword">function</span>(min, max) {
+  <span class="code-keyword">return</span> <span class="code-keyword">this</span>.where(<span class="code-string">'age'</span>).gte(min).lte(max);
+});
+
+<span class="code-comment">// Query helper for text search</span>
+mongoo.query(<span class="code-string">'User'</span>, <span class="code-string">'search'</span>, <span class="code-keyword">function</span>(text) {
+  <span class="code-keyword">return</span> <span class="code-keyword">this</span>.find({
+    <span class="code-property">$or</span>: [
+      { <span class="code-property">name</span>: { <span class="code-property">$regex</span>: text, <span class="code-property">$options</span>: <span class="code-string">'i'</span> } },
+      { <span class="code-property">email</span>: { <span class="code-property">$regex</span>: text, <span class="code-property">$options</span>: <span class="code-string">'i'</span> } }
+    ]
+  });
+});
+
+<span class="code-comment">// Usage</span>
+<span class="code-keyword">const</span> adults = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>).byAgeRange(<span class="code-number">18</span>, <span class="code-number">65</span>);
+<span class="code-keyword">const</span> searchResults = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>).search(<span class="code-string">'alice'</span>);</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Middleware -->
+        <section id="middleware" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-code-branch"></i> Middleware (Hooks)</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Middleware (hooks) allow you to execute functions before or after certain operations:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'middleware-pre')">Pre Hooks</div>
+                        <div class="tab" onclick="openTab(event, 'middleware-post')">Post Hooks</div>
+                        <div class="tab" onclick="openTab(event, 'middleware-aggregate')">Aggregate Hooks</div>
+                    </div>
+                    
+                    <div id="middleware-pre" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Pre-save hook</span>
+mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'save'</span>, <span class="code-keyword">async function</span>(next) {
+  <span class="code-keyword">if</span> (<span class="code-keyword">this</span>.isModified(<span class="code-string">'password'</span>)) {
+    <span class="code-keyword">this</span>.password = <span class="code-keyword">await</span> bcrypt.hash(<span class="code-keyword">this</span>.password, <span class="code-number">12</span>);
+  }
+  next();
+});
+
+<span class="code-comment">// Pre-remove hook</span>
+mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'remove'</span>, <span class="code-keyword">async function</span>(next) {
+  <span class="code-comment">// Remove user's posts when user is deleted</span>
+  <span class="code-keyword">await</span> mongoo.delete(<span class="code-string">'Post'</span>, { <span class="code-property">author</span>: <span class="code-keyword">this</span>._id });
+  next();
+});
+
+<span class="code-comment">// Pre-find hook</span>
+mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'find'</span>, <span class="code-keyword">function</span>(next) {
+  <span class="code-comment">// Only find active users by default</span>
+  <span class="code-keyword">this</span>.where({ <span class="code-property">isActive</span>: <span class="code-keyword">true</span> });
+  next();
+});</code>
+                        </div>
+                    </div>
+                    
+                    <div id="middleware-post" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Post-save hook</span>
+mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'save'</span>, <span class="code-keyword">function</span>(doc) {
+  <span class="code-function">console</span>.log(<span class="code-string">`User </span><span class="code-function">${</span>doc.name<span class="code-function">}</span><span class="code-string"> was saved`</span>);
+});
+
+<span class="code-comment">// Post-remove hook</span>
+mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'remove'</span>, <span class="code-keyword">function</span>(doc) {
+  <span class="code-function">console</span>.log(<span class="code-string">`User </span><span class="code-function">${</span>doc.name<span class="code-function">}</span><span class="code-string"> was removed`</span>);
+});
+
+<span class="code-comment">// Post-find hook</span>
+mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'find'</span>, <span class="code-keyword">function</span>(docs) {
+  <span class="code-function">console</span>.log(<span class="code-string">`Found </span><span class="code-function">${</span>docs.length<span class="code-function">}</span><span class="code-string"> users`</span>);
+});</code>
+                        </div>
+                    </div>
+                    
+                    <div id="middleware-aggregate" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Pre-aggregate hook</span>
+mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'aggregate'</span>, <span class="code-keyword">function</span>(next) {
+  <span class="code-comment">// Add match stage to exclude deleted users</span>
+  <span class="code-keyword">this</span>.pipeline().unshift({
+    <span class="code-property">$match</span>: { <span class="code-property">isActive</span>: <span class="code-keyword">true</span> }
+  });
+  next();
+});
+
+<span class="code-comment">// Post-aggregate hook</span>
+mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'aggregate'</span>, <span class="code-keyword">function</span>(docs) {
+  <span class="code-function">console</span>.log(<span class="code-string">`Aggregation returned </span><span class="code-function">${</span>docs.length<span class="code-function">}</span><span class="code-string"> documents`</span>);
+});</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions -->
+        <section id="transactions" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-exchange-alt"></i> Transactions</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Execute multiple operations as a single atomic transaction:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-title">JavaScript</div>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <code><span class="code-comment">// Basic transaction</span>
+<span class="code-keyword">await</span> mongoo.withTransaction(<span class="code-keyword">async</span> (session) => {
+  <span class="code-comment">// Create user</span>
+  <span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
+    <span class="code-property">name</span>: <span class="code-string">'Alice'</span>,
+    <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span>
+  }, { session });
+
+  <span class="code-comment">// Create user's first post</span>
+  <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'Post'</span>, {
+    <span class="code-property">title</span>: <span class="code-string">'First Post'</span>,
+    <span class="code-property">content</span>: <span class="code-string">'Hello World!'</span>,
+    <span class="code-property">author</span>: user._id
+  }, { session });
+});
+
+<span class="code-comment">// Transaction with retry logic</span>
+<span class="code-keyword">await</span> mongoo.withRetryTransaction(<span class="code-keyword">async</span> (session) => {
+  <span class="code-comment">// Transfer money between accounts</span>
+  <span class="code-keyword">await</span> mongoo.update(
+    <span class="code-string">'Account'</span>,
+    { <span class="code-property">_id</span>: <span class="code-string">'fromAccountId'</span>, <span class="code-property">balance</span>: { <span class="code-property">$gte</span>: <span class="code-number">100</span> } },
+    { <span class="code-property">$inc</span>: { <span class="code-property">balance</span>: -<span class="code-number">100</span> } },
+    { session }
+  );
+
+  <span class="code-keyword">await</span> mongoo.update(
+    <span class="code-string">'Account'</span>,
+    { <span class="code-property">_id</span>: <span class="code-string">'toAccountId'</span> },
+    { <span class="code-property">$inc</span>: { <span class="code-property">balance</span>: <span class="code-number">100</span> } },
+    { session }
+  );
+}, <span class="code-number">3</span>); <span class="code-comment">// Retry up to 3 times</span>
+
+<span class="code-comment">// Manual session management</span>
+<span class="code-keyword">const</span> session = <span class="code-keyword">await</span> mongoo.startSession();
+<span class="code-keyword">try</span> {
+  session.startTransaction();
+  
+  <span class="code-comment">// Your operations here</span>
+  <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, userData, { session });
+  
+  <span class="code-keyword">await</span> session.commitTransaction();
+} <span class="code-keyword">catch</span> (error) {
+  <span class="code-keyword">await</span> session.abortTransaction();
+  <span class="code-keyword">throw</span> error;
+} <span class="code-keyword">finally</span> {
+  session.endSession();
+}</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Aggregation -->
+        <section id="aggregation" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Aggregation</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>Perform complex data analysis with MongoDB aggregation pipeline:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="openTab(event, 'aggregation-basic')">Basic Aggregation</div>
+                        <div class="tab" onclick="openTab(event, 'aggregation-advanced')">Advanced Pipeline</div>
+                        <div class="tab" onclick="openTab(event, 'aggregation-facets')">Facets & Multiple</div>
+                    </div>
+                    
+                    <div id="aggregation-basic" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Basic aggregation - group by category</span>
+<span class="code-keyword">const</span> categoryStats = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Product'</span>, [
+  {
+    <span class="code-property">$group</span>: {
+      <span class="code-property">_id</span>: <span class="code-string">'$category'</span>,
+      <span class="code-property">totalProducts</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> },
+      <span class="code-property">avgPrice</span>: { <span class="code-property">$avg</span>: <span class="code-string">'$price'</span> },
+      <span class="code-property">maxPrice</span>: { <span class="code-property">$max</span>: <span class="code-string">'$price'</span> },
+      <span class="code-property">minPrice</span>: { <span class="code-property">$min</span>: <span class="code-string">'$price'</span> }
+    }
+  },
+  {
+    <span class="code-property">$sort</span>: { <span class="code-property">totalProducts</span>: -<span class="code-number">1</span> }
+  }
+]);
+
+<span class="code-comment">// Lookup aggregation (join collections)</span>
+<span class="code-keyword">const</span> userOrders = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Order'</span>, [
+  {
+    <span class="code-property">$lookup</span>: {
+      <span class="code-property">from</span>: <span class="code-string">'users'</span>,
+      <span class="code-property">localField</span>: <span class="code-string">'customer'</span>,
+      <span class="code-property">foreignField</span>: <span class="code-string">'_id'</span>,
+      <span class="code-property">as</span>: <span class="code-string">'customerInfo'</span>
+    }
+  },
+  {
+    <span class="code-property">$unwind</span>: <span class="code-string">'$customerInfo'</span>
+  },
+  {
+    <span class="code-property">$project</span>: {
+      <span class="code-property">orderNumber</span>: <span class="code-number">1</span>,
+      <span class="code-property">total</span>: <span class="code-number">1</span>,
+      <span class="code-property">customerName</span>: <span class="code-string">'$customerInfo.name'</span>,
+      <span class="code-property">customerEmail</span>: <span class="code-string">'$customerInfo.email'</span>
+    }
+  }
+]);</code>
+                        </div>
+                    </div>
+                    
+                    <div id="aggregation-advanced" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Advanced aggregation with multiple stages</span>
+<span class="code-keyword">const</span> salesReport = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Order'</span>, [
+  <span class="code-comment">// Match orders from last 30 days</span>
+  {
+    <span class="code-property">$match</span>: {
+      <span class="code-property">createdAt</span>: {
+        <span class="code-property">$gte</span>: <span class="code-keyword">new</span> Date(Date.now() - <span class="code-number">30</span> * <span class="code-number">24</span> * <span class="code-number">60</span> * <span class="code-number">60</span> * <span class="code-number">1000</span>)
+      },
+      <span class="code-property">status</span>: <span class="code-string">'completed'</span>
+    }
+  },
+  <span class="code-comment">// Unwind items array</span>
+  {
+    <span class="code-property">$unwind</span>: <span class="code-string">'$items'</span>
+  },
+  <span class="code-comment">// Lookup product details</span>
+  {
+    <span class="code-property">$lookup</span>: {
+      <span class="code-property">from</span>: <span class="code-string">'products'</span>,
+      <span class="code-property">localField</span>: <span class="code-string">'items.product'</span>,
+      <span class="code-property">foreignField</span>: <span class="code-string">'_id'</span>,
+      <span class="code-property">as</span>: <span class="code-string">'productInfo'</span>
+    }
+  },
+  <span class="code-comment">// Unwind product info</span>
+  {
+    <span class="code-property">$unwind</span>: <span class="code-string">'$productInfo'</span>
+  },
+  <span class="code-comment">// Group by product category</span>
+  {
+    <span class="code-property">$group</span>: {
+      <span class="code-property">_id</span>: <span class="code-string">'$productInfo.category'</span>,
+      <span class="code-property">totalRevenue</span>: { <span class="code-property">$sum</span>: <span class="code-string">'$items.total'</span> },
+      <span class="code-property">totalUnits</span>: { <span class="code-property">$sum</span>: <span class="code-string">'$items.quantity'</span> },
+      <span class="code-property">avgOrderValue</span>: { <span class="code-property">$avg</span>: <span class="code-string">'$total'</span> }
+    }
+  },
+  <span class="code-comment">// Sort by revenue</span>
+  {
+    <span class="code-property">$sort</span>: { <span class="code-property">totalRevenue</span>: -<span class="code-number">1</span> }
+  }
+]);</code>
+                        </div>
+                    </div>
+                    
+                    <div id="aggregation-facets" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-title">JavaScript</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <code><span class="code-comment">// Faceted search with multiple aggregations</span>
+<span class="code-keyword">const</span> facetedResults = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Product'</span>, [
+  {
+    <span class="code-property">$match</span>: {
+      <span class="code-property">price</span>: { <span class="code-property">$lte</span>: <span class="code-number">1000</span> },
+      <span class="code-property">isActive</span>: <span class="code-keyword">true</span>
+    }
+  },
+  {
+    <span class="code-property">$facet</span>: {
+      <span class="code-comment">// Price ranges</span>
+      <span class="code-property">priceRanges</span>: [
+        {
+          <span class="code-property">$bucket</span>: {
+            <span class="code-property">groupBy</span>: <span class="code-string">'$price'</span>,
+            <span class="code-property">boundaries</span>: [<span class="code-number">0</span>, <span class="code-number">50</span>, <span class="code-number">100</span>, <span class="code-number">200</span>, <span class="code-number">500</span>, <span class="code-number">1000</span>],
+            <span class="code-property">default</span>: <span class="code-string">'Other'</span>,
+            <span class="code-property">output</span>: {
+              <span class="code-property">count</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> },
+              <span class="code-property">products</span>: { <span class="code-property">$push</span>: <span class="code-string">'$name'</span> }
+            }
+          }
+        }
+      ],
+      <span class="code-comment">// Categories</span>
+      <span class="code-property">categories</span>: [
+        {
+          <span class="code-property">$group</span>: {
+            <span class="code-property">_id</span>: <span class="code-string">'$category'</span>,
+            <span class="code-property">count</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> }
+          }
+        },
+        { <span class="code-property">$sort</span>: { <span class="code-property">count</span>: -<span class="code-number">1</span> } },
+        { <span class="code-property">$limit</span>: <span class="code-number">10</span> }
+      ],
+      <span class="code-comment">// Total count</span>
+      <span class="code-property">totalCount</span>: [
+        { <span class="code-property">$count</span>: <span class="code-string">'count'</span> }
+      ]
+    }
+  }
+]);</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Continue with other sections... -->
 
         <!-- Schema Designer Button -->
         <a href="/schema-design.html" class="schema-designer-btn">
@@ -1201,6 +1754,14 @@ mongoo.model(<span class="code-string">'User'</span>, {
                 }
             });
         });
+
+        // SEO: Track page views (simplified)
+        if (typeof gtag !== 'undefined') {
+            gtag('config', 'GA_MEASUREMENT_ID', {
+                page_title: 'Easy-Mongoo Documentation',
+                page_location: window.location.href
+            });
+        }
     </script>
 </body>
 </html>
