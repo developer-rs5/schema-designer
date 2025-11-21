@@ -386,6 +386,32 @@
             margin-top: 16px;
         }
 
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .copy-btn {
+            background: #1f6feb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: #388bfd;
+        }
+
+        .copy-btn.copied {
+            background: #2ea043;
+        }
+
         .zoom-controls {
             position: fixed;
             bottom: 20px;
@@ -604,7 +630,12 @@
             <div class="modal-content">
                 <h2>Exported Schema</h2>
                 <pre id="exportContent"></pre>
-                <button class="modal-close" onclick="closeModal()">Close</button>
+                <div class="modal-actions">
+                    <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">
+                        📋 Copy to Clipboard
+                    </button>
+                    <button class="modal-close" onclick="closeModal()">Close</button>
+                </div>
             </div>
         </div>
 
@@ -1514,6 +1545,26 @@
             });
 
             return code;
+        }
+
+        function copyToClipboard() {
+            const content = document.getElementById('exportContent').textContent;
+            const copyBtn = document.getElementById('copyBtn');
+            
+            navigator.clipboard.writeText(content).then(() => {
+                // Visual feedback
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✓ Copied!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            });
         }
 
         function closeModal() {
