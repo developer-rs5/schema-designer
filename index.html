@@ -3,669 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy-Mongoo - Complete MongoDB Wrapper Documentation | Ultra-Simple MongoDB Operations</title>
-    <meta name="description" content="Complete documentation for Easy-Mongoo - the ultra-simple MongoDB wrapper with all Mongoose features. Learn schema creation, CRUD operations, transactions, aggregation and more with beginner-friendly examples.">
-    <meta name="keywords" content="easy-mongoo, mongodb, mongoose, nodejs, database, crud, schema, transactions, aggregation, documentation">
-    <meta name="author" content="Easy-Mongoo Team">
-    <meta property="og:title" content="Easy-Mongoo - Complete MongoDB Wrapper Documentation">
-    <meta property="og:description" content="Ultra-simple MongoDB wrapper with all Mongoose features in easy syntax">
-    <meta property="og:type" content="website">
+    <title>Easy-Mongoo - Complete MongoDB Wrapper Documentation</title>
+    <meta name="description" content="Complete documentation for Easy-Mongoo - the ultra-simple MongoDB wrapper with all Mongoose features.">
+    <link rel="shortcut icon" href="easy-mongooo.png" type="image/x-icon">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Easy-Mongoo",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Node.js",
-      "description": "Ultra-simple MongoDB wrapper with all Mongoose features in easy syntax",
-      "keywords": "mongodb, mongoose, nodejs, database, wrapper",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
-    }
-    </script>
+    
     <style>
-        :root {
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
-            --secondary: #10b981;
-            --dark: #0f172a;
-            --darker: #0a0f1c;
-            --light: #cbd5e1;
-            --gray: #64748b;
-            --border: #334155;
-            --code-bg: #1e293b;
-            --code-highlight: #334155;
-            --sidebar-width: 280px;
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        * {
-            transition: all 0.5s linear;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
         }
-
-        body {
-            background-color: var(--darker);
-            color: var(--light);
-            line-height: 1.6;
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
         }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--dark);
-            color: var(--light);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 100;
-            border-right: 1px solid var(--border);
+        .animate-bounce-in {
+            animation: bounceIn 0.6s ease-out forwards;
         }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
         }
-
-        .sidebar-header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .logo {
-            color: var(--secondary);
-            font-size: 1.8rem;
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
         }
-
-        .sidebar-nav {
-            padding: 1rem 0;
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
         }
-
-        .nav-section {
-            margin-bottom: 1.5rem;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
         }
-
-        .nav-section h3 {
-            padding: 0.5rem 1.5rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: var(--gray);
-            letter-spacing: 1px;
+        
+        /* Code syntax highlighting */
+        .code-keyword { color: #c678dd; }
+        .code-string { color: #98c379; }
+        .code-comment { color: #5c6370; font-style: italic; }
+        .code-function { color: #61afef; }
+        .code-operator { color: #56b6c2; }
+        .code-number { color: #d19a66; }
+        .code-property { color: #e06c75; }
+        
+        /* Code box styling */
+        .code-box {
+            background: #1a1a1a;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            width: 100%;
         }
-
-        .nav-links {
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-bottom: 0.2rem;
-        }
-
-        .nav-links a {
-            display: block;
-            padding: 0.7rem 1.5rem;
-            color: var(--light);
-            text-decoration: none;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-
-        .nav-links a.active {
-            background: rgba(139, 92, 246, 0.2);
-            color: white;
-            border-left: 3px solid var(--primary);
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-        }
-
-        .section {
-            margin-bottom: 3rem;
-            scroll-margin-top: 2rem;
-        }
-
-        .section-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .section-header h2 {
-            font-size: 1.8rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-header i {
-            color: var(--secondary);
-        }
-
-        .card {
-            background: var(--dark);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .card-header h3 {
-            font-size: 1.3rem;
-            color: var(--light);
-        }
-
-        .card-body {
-            line-height: 1.7;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .feature-card {
-            background: var(--dark);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .feature-icon {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h4 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--light);
-        }
-
-        .feature-card p {
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-
-        /* Code Styles */
-        .code-block {
-            background: var(--code-bg);
-            color: #e2e8f0;
-            border-radius: 6px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            overflow-x: auto;
-            font-family: 'Fira Code', 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            border: 1px solid var(--border);
-        }
-
-        .code-block code {
-            display: block;
-            white-space: pre;
-        }
-
         .code-header {
+            background: #2d2d2d;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #374151;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
         }
-
-        .code-title {
-            font-weight: 600;
-            color: var(--light);
+        .code-content {
+            padding: 1rem;
+            overflow-x: auto;
         }
-
-        .copy-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.3rem 0.8rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: background 0.2s;
+        .code-content pre {
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
-
-        .copy-btn:hover {
-            background: var(--primary-dark);
+        .code-content code {
+            color: #e5e7eb;
         }
-
-        .code-keyword {
-            color: #ff79c6;
-        }
-
-        .code-string {
-            color: #f1fa8c;
-        }
-
-        .code-comment {
-            color: #6272a4;
-            font-style: italic;
-        }
-
-        .code-function {
-            color: #50fa7b;
-        }
-
-        .code-operator {
-            color: #ff79c6;
-        }
-
-        .code-number {
-            color: #bd93f9;
-        }
-
-        .code-property {
-            color: #8be9fd;
-        }
-
-        /* Button Styles */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--primary);
-            color: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-        }
-
-        .btn-secondary:hover {
-            background: #0da271;
-        }
-
-        .btn-large {
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-        }
-
-        .btn-container {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 3rem 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-radius: 10px;
-            margin-bottom: 3rem;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            opacity: 0.9;
-        }
-
-        /* Schema Designer Button */
-        .schema-designer-btn {
+        
+        /* Sidebar improvements */
+        .sidebar {
+            width: 240px;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 99;
-            background: var(--secondary);
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 40;
+            background: #1f2937;
+            border-right: 1px solid #374151;
         }
-
-        .schema-designer-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        .schema-designer-btn i {
-            font-size: 1.5rem;
-        }
-
-        .schema-designer-btn span {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #ef4444;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Mobile Menu Toggle */
-        .mobile-menu-toggle {
+        
+        /* Mobile overlay */
+        .sidebar-overlay {
             display: none;
             position: fixed;
-            top: 1rem;
-            left: 1rem;
-            background: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 5px;
-            z-index: 101;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 30;
         }
-
-        /* Responsive Styles */
+        
+        /* Active sidebar state */
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+        }
+        
+        /* Main content area */
+        .main-content {
+            margin-left: 240px;
+            width: calc(100% - 240px);
+            min-height: 100vh;
+        }
+        
+        /* Responsive adjustments */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-            
             .sidebar.active {
                 transform: translateX(0);
             }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
             .mobile-menu-toggle {
                 display: flex;
             }
-        }
-
-        @media (max-width: 768px) {
+            .sidebar-overlay.active {
+                display: block;
+            }
             .main-content {
-                padding: 1rem;
+                margin-left: 0;
+                width: 100%;
             }
-            
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .code-content pre {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
             .hero h1 {
-                font-size: 2.2rem;
+                font-size: 2rem !important;
             }
-            
-            .feature-grid {
-                grid-template-columns: 1fr;
+            .hero p {
+                font-size: 1rem !important;
             }
-            
+            .section-header h2 {
+                font-size: 1.75rem !important;
+            }
+            .grid-cols-3 {
+                grid-template-columns: repeat(1, 1fr) !important;
+                gap: 1rem !important;
+            }
             .btn-container {
                 flex-direction: column;
             }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
-
-        /* Table Styles */
+        
+        /* Ensure content doesn't overflow */
+        .container {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Fix for code blocks on small screens */
+        pre {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        /* Ensure images and other media are responsive */
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Fix for tables on mobile */
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-        }
-
-        th, td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background: var(--dark);
-            font-weight: 600;
-            color: var(--light);
-        }
-
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .tab {
-            padding: 0.7rem 1.5rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-            color: var(--gray);
+            display: block;
+            overflow-x: auto;
             white-space: nowrap;
         }
-
-        .tab.active {
-            border-bottom: 3px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Alert Styles */
-        .alert {
-            padding: 1rem;
-            border-radius: 6px;
-            margin: 1rem 0;
-        }
-
-        .alert-info {
-            background: rgba(59, 130, 246, 0.1);
-            color: #93c5fd;
-            border-left: 4px solid #3b82f6;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #6ee7b7;
-            border-left: 4px solid #10b981;
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #fcd34d;
-            border-left: 4px solid #f59e0b;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gray);
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-
-        .breadcrumb a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
-        /* Feature Badge */
-        .feature-badge {
-            display: inline-block;
-            background: var(--secondary);
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-            vertical-align: middle;
+        
+        /* Fix for PC layout */
+        @media (min-width: 1025px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .main-content {
+                margin-left: 240px !important;
+                width: calc(100% - 240px) !important;
+            }
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-white min-h-screen overflow-x-hidden">
     <!-- Mobile Menu Toggle -->
-    <div class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
+    <div class="mobile-menu-toggle fixed top-4 left-4 z-50">
+        <button id="mobileMenuToggle" class="bg-gray-800 text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-lg">
+            <i class="fas fa-bars"></i>
+        </button>
     </div>
 
+    <!-- Sidebar Overlay (for mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
     <!-- Sidebar Navigation -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <i class="fas fa-leaf logo"></i>
-            <h1>Easy-Mongoo</h1>
+    <div id="sidebar" class="sidebar">
+        <div class="p-4 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-leaf text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">Easy-Mongoo</h1>
+                    <p class="text-xs text-gray-400">MongoDB Wrapper</p>
+                </div>
+            </div>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <h3>Getting Started</h3>
-                <ul class="nav-links">
-                    <li><a href="#introduction" class="active">Introduction</a></li>
-                    <li><a href="#installation">Installation</a></li>
-                    <li><a href="#quick-start">Quick Start</a></li>
+        
+        <nav class="p-4 overflow-y-auto h-full">
+            <div class="mb-8">
+                <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider mb-3">Getting Started</h3>
+                <ul class="space-y-1">
+                    <li><a href="#introduction" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Introduction</a></li>
+                    <li><a href="#installation" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Installation</a></li>
+                    <li><a href="#quick-start" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Quick Start</a></li>
                 </ul>
             </div>
             
-            <div class="nav-section">
-                <h3>Core Concepts</h3>
-                <ul class="nav-links">
-                    <li><a href="#connection">Connection</a></li>
-                    <li><a href="#schema">Schema Creation</a></li>
-                    <li><a href="#models">Models</a></li>
-                    <li><a href="#crud">CRUD Operations</a></li>
+            <div class="mb-8">
+                <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider mb-3">Core Concepts</h3>
+                <ul class="space-y-1">
+                    <li><a href="#connection" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Connection</a></li>
+                    <li><a href="#schema" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Schema Creation</a></li>
+                    <li><a href="#models" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Models</a></li>
+                    <li><a href="#crud" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">CRUD Operations</a></li>
                 </ul>
             </div>
             
-            <div class="nav-section">
-                <h3>Advanced Features</h3>
-                <ul class="nav-links">
-                    <li><a href="#virtuals">Virtual Fields</a></li>
-                    <li><a href="#methods">Methods & Statics</a></li>
-                    <li><a href="#middleware">Middleware</a></li>
-                    <li><a href="#transactions">Transactions</a></li>
-                    <li><a href="#aggregation">Aggregation</a></li>
-                    <li><a href="#indexes">Indexes</a></li>
-                    <li><a href="#plugins">Plugins</a></li>
-                    <li><a href="#discriminators">Discriminators</a></li>
-                    <li><a href="#geospatial">Geospatial Queries</a></li>
-                    <li><a href="#text-search">Text Search</a></li>
-                    <li><a href="#bulk-operations">Bulk Operations</a></li>
-                    <li><a href="#pagination">Pagination</a></li>
-                    <li><a href="#caching">Caching</a></li>
-                    <li><a href="#migration">Data Migration</a></li>
-                </ul>
-            </div>
-            
-            <div class="nav-section">
-                <h3>Reference</h3>
-                <ul class="nav-links">
-                    <li><a href="#schema-shortcuts">Schema Shortcuts</a></li>
-                    <li><a href="#templates">Predefined Templates</a></li>
-                    <li><a href="#error-handling">Error Handling</a></li>
-                    <li><a href="#debugging">Debugging</a></li>
-                    <li><a href="#api-reference">API Reference</a></li>
-                </ul>
-            </div>
-            
-            <div class="nav-section">
-                <h3>Examples</h3>
-                <ul class="nav-links">
-                    <li><a href="#basic-example">Basic Usage</a></li>
-                    <li><a href="#advanced-example">Advanced Usage</a></li>
-                    <li><a href="#full-example">Full Application</a></li>
+            <div class="mb-8">
+                <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider mb-3">Advanced Features</h3>
+                <ul class="space-y-1">
+                    <li><a href="#virtuals" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Virtual Fields</a></li>
+                    <li><a href="#methods" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Methods & Statics</a></li>
+                    <li><a href="#middleware" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Middleware</a></li>
+                    <li><a href="#transactions" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Transactions</a></li>
+                    <li><a href="#aggregation" class="nav-link block py-2 px-3 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded transition-colors">Aggregation</a></li>
                 </ul>
             </div>
         </nav>
@@ -673,1096 +293,442 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="#">Home</a> <i class="fas fa-chevron-right"></i>
-            <span>Easy-Mongoo Documentation</span>
-        </div>
-
         <!-- Hero Section -->
-        <section class="hero">
-            <h1>Easy-Mongoo</h1>
-            <p>Ultra-simple MongoDB wrapper with all mongoose features in easy syntax</p>
-            <div class="btn-container">
-                <a href="#installation" class="btn btn-large"><i class="fas fa-rocket"></i> Get Started</a>
-                <a href="https://www.npmjs.com/package/easy-mongoo/" class="btn btn-secondary btn-large"><i class="fab fa-npm"></i> View on NPM</a>
+        <section class="bg-gradient-to-br from-gray-800 via-gray-900 to-black py-12 lg:py-20">
+            <div class="container mx-auto px-4 max-w-full">
+                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                    <div class="space-y-6 lg:space-y-8 animate-fade-in">
+                        <div class="space-y-4">
+                            <h1 class="text-3xl lg:text-5xl font-bold text-white leading-tight">
+                                Ultra-Simple
+                                <span class="block bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent animate-gradient">
+                                    MongoDB Wrapper
+                                </span>
+                            </h1>
+                            <p class="text-lg lg:text-xl text-gray-300 leading-relaxed">
+                                Easy-Mongoo provides an intuitive MongoDB wrapper with all Mongoose features in easy syntax. 
+                                Build powerful database applications with minimal code.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a
+                                href="#installation"
+                                class="bg-green-600 text-white px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-semibold hover:bg-green-700 transition-all duration-300 hover:scale-105 transform shadow-lg hover:shadow-green-500/25 text-center"
+                            >
+                                Get Started
+                            </a>
+                            <a
+                                href="https://www.npmjs.com/package/easy-mongoo"
+                                class="border border-gray-600 text-gray-300 px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-semibold hover:border-green-500 hover:text-green-400 transition-all duration-300 hover:scale-105 transform text-center"
+                            >
+                                View on NPM
+                            </a>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 lg:gap-6 pt-6 lg:pt-8">
+                            <div class="text-center animate-bounce-in" style="animation-delay: 0ms">
+                                <div class="text-xl lg:text-2xl font-bold text-white">One-Line</div>
+                                <div class="text-xs lg:text-sm text-gray-400">Operations</div>
+                            </div>
+                            <div class="text-center animate-bounce-in" style="animation-delay: 200ms">
+                                <div class="text-xl lg:text-2xl font-bold text-white">Auto</div>
+                                <div class="text-xs lg:text-sm text-gray-400">Error Handling</div>
+                            </div>
+                            <div class="text-center animate-bounce-in" style="animation-delay: 400ms">
+                                <div class="text-xl lg:text-2xl font-bold text-white">All</div>
+                                <div class="text-xs lg:text-sm text-gray-400">Mongoose Features</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-box transform hover:scale-105 transition-all duration-500">
+                        <div class="code-header">
+                            <div class="flex items-center space-x-2">
+                                <div class="flex space-x-2">
+                                    <div class="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+                                    <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                                </div>
+                                <div class="text-gray-300 text-sm">basic-usage.js</div>
+                            </div>
+                            <button class="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 copy-btn">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code>// Connect to MongoDB
+await mongoo.connect('mongodb://localhost/mydb');
+
+// Create schema with shortcuts
+mongoo.model('User', {
+  name: 'string!',
+  email: 'email',
+  age: 'number?'
+});
+
+// Use it!
+const user = await mongoo.create('User', {
+  name: 'John Doe',
+  email: 'john@example.com'
+});
+
+console.log(user);</code></pre>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Introduction -->
-        <section id="introduction" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-info-circle"></i> Introduction</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Easy-Mongoo is a powerful yet simple wrapper for MongoDB with Mongoose. It provides an intuitive API that makes database operations effortless while maintaining all the advanced features of Mongoose.</p>
-                    
-                    <div class="alert alert-info">
-                        <p><strong>Why Easy-Mongoo?</strong> Traditional Mongoose can be complex for beginners. Easy-Mongoo simplifies everything while keeping all the power!</p>
+        <section id="introduction" class="py-12 lg:py-20 bg-gray-900">
+            <div class="container mx-auto px-4 max-w-full">
+                <div class="text-center mb-12 lg:mb-16">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">
+                        Why Easy-Mongoo?
+                    </h2>
+                    <p class="text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto">
+                        Traditional Mongoose can be complex for beginners. Easy-Mongoo simplifies everything while keeping all the power!
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                    <div class="bg-gray-800 rounded-xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-gray-700 group">
+                        <div class="text-3xl mb-4 text-green-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">One-Line Operations</h3>
+                        <p class="text-gray-300">Perform complex database operations with just one line of code</p>
                     </div>
-                    
-                    <div class="feature-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                            <h4>One-Line Operations</h4>
-                            <p>Perform complex database operations with just one line of code</p>
+                    <div class="bg-gray-800 rounded-xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-gray-700 group">
+                        <div class="text-3xl mb-4 text-green-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-shield-alt"></i>
                         </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <h4>Auto Error Handling</h4>
-                            <p>Automatic error handling with user-friendly messages</p>
+                        <h3 class="text-xl font-semibold text-white mb-2">Auto Error Handling</h3>
+                        <p class="text-gray-300">Automatic error handling with user-friendly messages</p>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-gray-700 group">
+                        <div class="text-3xl mb-4 text-green-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-magic"></i>
                         </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-magic"></i>
-                            </div>
-                            <h4>Smart Schema System</h4>
-                            <p>Create schemas with simple shortcuts and auto-features</p>
+                        <h3 class="text-xl font-semibold text-white mb-2">Smart Schema System</h3>
+                        <p class="text-gray-300">Create schemas with simple shortcuts and auto-features</p>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-gray-700 group">
+                        <div class="text-3xl mb-4 text-green-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-cogs"></i>
                         </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-cogs"></i>
-                            </div>
-                            <h4>All Mongoose Features</h4>
-                            <p>Virtuals, middleware, transactions, aggregation - everything included!</p>
-                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">All Mongoose Features</h3>
+                        <p class="text-gray-300">Virtuals, middleware, transactions, aggregation - everything included!</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Installation -->
-        <section id="installation" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-download"></i> Installation</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Install Easy-Mongoo using npm:</p>
-                    <div class="code-block">
-                        <div class="code-header">
-                            <div class="code-title">Terminal</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <section id="installation" class="py-12 lg:py-20 bg-gray-800">
+            <div class="container mx-auto px-4 max-w-full">
+                <div class="text-center mb-12 lg:mb-16">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">
+                        Installation
+                    </h2>
+                    <p class="text-lg lg:text-xl text-gray-300">
+                        Get started in minutes with ultra-simple MongoDB operations
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+                    <div class="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 hover:shadow-2xl transition-all duration-300">
+                        <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
+                            <i class="fas fa-box text-2xl mr-3 text-green-400"></i>
+                            NPM Installation
+                        </h3>
+                        <div class="code-box">
+                            <div class="code-header">
+                                <span class="text-gray-400 text-sm">Terminal</span>
+                                <button class="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 copy-btn">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="code-content">
+                                <code>npm install easy-mongoo</code>
+                            </div>
                         </div>
-                        <code>npm install easy-mongoo</code>
                     </div>
-                    
-                    <p>Then require it in your project:</p>
-                    <div class="code-block">
-                        <div class="code-header">
-                            <div class="code-title">JavaScript</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+
+                    <div class="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 hover:shadow-2xl transition-all duration-300">
+                        <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
+                            <i class="fas fa-code text-2xl mr-3 text-blue-400"></i>
+                            Basic Usage
+                        </h3>
+                        <div class="code-box">
+                            <div class="code-header">
+                                <span class="text-gray-400 text-sm">JavaScript</span>
+                                <button class="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 copy-btn">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="code-content">
+                                <code>const mongoo = require('easy-mongoo');</code>
+                            </div>
                         </div>
-                        <code><span class="code-keyword">const</span> mongoo = <span class="code-function">require</span>(<span class="code-string">'easy-mongoo'</span>);</code>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Quick Start -->
-        <section id="quick-start" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-running"></i> Quick Start</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Get started with Easy-Mongoo in just 3 steps:</p>
-                    
-                    <div class="code-block">
+        <section id="quick-start" class="py-12 lg:py-20 bg-gray-900">
+            <div class="container mx-auto px-4 max-w-full">
+                <div class="text-center mb-12 lg:mb-16">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">
+                        Quick Start
+                    </h2>
+                    <p class="text-lg lg:text-xl text-gray-300">
+                        Start building your database application in under 5 minutes
+                    </p>
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+                    <div class="code-box">
                         <div class="code-header">
-                            <div class="code-title">JavaScript</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <span class="text-gray-400 text-sm">🚀 Complete Example</span>
+                            <button class="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 copy-btn text-sm">
+                                <i class="far fa-copy mr-1"></i> Copy
+                            </button>
                         </div>
-                        <code><span class="code-comment">// 1. Connect to MongoDB</span>
-<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>);
+                        <div class="code-content">
+                            <pre><code>// Import Easy-Mongoo
+const mongoo = require('easy-mongoo');
 
-<span class="code-comment">// 2. Create a model with easy schema</span>
-mongoo.model(<span class="code-string">'User'</span>, {
-  <span class="code-property">name</span>: <span class="code-string">'string!'</span>,
-  <span class="code-property">email</span>: <span class="code-string">'email'</span>,
-  <span class="code-property">age</span>: <span class="code-string">'number?'</span>
-});
+async function main() {
+  // 1. Connect to MongoDB
+  await mongoo.connect('mongodb://localhost:27017/mydb');
+  
+  // 2. Create a model with easy schema
+  mongoo.model('User', {
+    firstName: 'string!',
+    lastName: 'string!',
+    email: 'email',
+    age: 'number?',
+    isActive: 'boolean+'
+  });
+  
+  // 3. Create a document
+  const user = await mongoo.create('User', {
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    age: 30,
+    isActive: true
+  });
+  
+  // 4. Find documents
+  const users = await mongoo.find('User', { isActive: true });
+  
+  console.log('Created user:', user);
+  console.log('Active users:', users);
+}
 
-<span class="code-comment">// 3. Use it!</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
-  <span class="code-property">name</span>: <span class="code-string">'John Doe'</span>,
-  <span class="code-property">email</span>: <span class="code-string">'john@example.com'</span>,
-  <span class="code-property">age</span>: <span class="code-number">30</span>
-});
-
-<span class="code-function">console</span>.log(user);</code>
-                    </div>
-                    
-                    <div class="alert alert-success">
-                        <p><strong>That's it!</strong> You've just created a MongoDB connection, defined a schema, and saved a document with just a few lines of code.</p>
+main().catch(console.error);</code></pre>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Connection -->
-        <section id="connection" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-plug"></i> Connection</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Connect to MongoDB with automatic error handling and logging:</p>
-                    
-                    <div class="code-block">
-                        <div class="code-header">
-                            <div class="code-title">JavaScript</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        </div>
-                        <code><span class="code-comment">// Basic connection</span>
-<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>);
-
-<span class="code-comment">// With options and debug mode</span>
-<span class="code-keyword">await</span> mongoo.connect(<span class="code-string">'mongodb://localhost:27017/mydb'</span>, {
-  <span class="code-property">debug</span>: <span class="code-keyword">true</span>,
-  <span class="code-property">useNewUrlParser</span>: <span class="code-keyword">true</span>,
-  <span class="code-property">useUnifiedTopology</span>: <span class="code-keyword">true</span>
-});
-
-<span class="code-comment">// Check connection status</span>
-<span class="code-keyword">const</span> status = mongoo.status();
-<span class="code-function">console</span>.log(status);
-
-<span class="code-comment">// Disconnect when done</span>
-<span class="code-keyword">await</span> mongoo.disconnect();</code>
-                    </div>
-                    
-                    <h4>Connection Status Object</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Property</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>connected</td>
-                                <td>Boolean indicating connection status</td>
-                            </tr>
-                            <tr>
-                                <td>database</td>
-                                <td>Name of the connected database</td>
-                            </tr>
-                            <tr>
-                                <td>host</td>
-                                <td>Database host address</td>
-                            </tr>
-                            <tr>
-                                <td>models</td>
-                                <td>Array of registered model names</td>
-                            </tr>
-                            <tr>
-                                <td>readyState</td>
-                                <td>Mongoose connection state</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <section id="connection" class="py-12 lg:py-20 bg-gray-800">
+            <div class="container mx-auto px-4 max-w-full">
+                <div class="text-center mb-12 lg:mb-16">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">
+                        Database Connection
+                    </h2>
+                    <p class="text-lg lg:text-xl text-gray-300">
+                        Connect to MongoDB with automatic error handling and logging
+                    </p>
                 </div>
-            </div>
-        </section>
 
-        <!-- Schema Creation -->
-        <section id="schema" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-database"></i> Schema Creation</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Easy-Mongoo provides an ultra-simple schema system with smart shortcuts:</p>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="openTab(event, 'schema-basic')">Basic Schema</div>
-                        <div class="tab" onclick="openTab(event, 'schema-advanced')">Advanced Schema</div>
-                        <div class="tab" onclick="openTab(event, 'schema-shortcuts')">All Shortcuts</div>
-                    </div>
-                    
-                    <div id="schema-basic" class="tab-content active">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
+                    <div class="space-y-6 lg:space-y-8">
+                        <div class="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 hover:shadow-2xl transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-white mb-2">
+                                Basic Connection
+                            </h3>
+                            <div class="code-box">
+                                <div class="code-content">
+                                    <pre><code>// Simple connection
+await mongoo.connect('mongodb://localhost/mydb');
+
+// With options
+await mongoo.connect('mongodb://localhost/mydb', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});</code></pre>
+                                </div>
                             </div>
-                            <code><span class="code-comment">// Simple schema with shortcuts</span>
-<span class="code-keyword">const</span> userSchema = {
-  <span class="code-comment">// Required string</span>
-  <span class="code-property">name</span>: <span class="code-string">'string!'</span>,
-  
-  <span class="code-comment">// Optional number</span>
-  <span class="code-property">age</span>: <span class="code-string">'number?'</span>,
-  
-  <span class="code-comment">// Boolean with default value</span>
-  <span class="code-property">isActive</span>: <span class="code-string">'boolean+'</span>,
-  
-  <span class="code-comment">// Array of strings</span>
-  <span class="code-property">tags</span>: [<span class="code-string">'string'</span>],
-  
-  <span class="code-comment">// Object with nested properties</span>
-  <span class="code-property">address</span>: {
-    <span class="code-property">street</span>: <span class="code-string">'string!'</span>,
-    <span class="code-property">city</span>: <span class="code-string">'string!'</span>,
-    <span class="code-property">country</span>: <span class="code-string">'string!'</span>
-  }
-};</code>
+                        </div>
+
+                        <div class="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 hover:shadow-2xl transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-white mb-2">
+                                Connection Status
+                            </h3>
+                            <div class="code-box">
+                                <div class="code-content">
+                                    <pre><code>// Check connection status
+const status = mongoo.status();
+console.log(status);
+// {
+//   connected: true,
+//   database: 'mydb',
+//   host: 'localhost:27017',
+//   models: ['User', 'Product']
+// }</code></pre>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div id="schema-advanced" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+
+                    <div class="space-y-6 lg:space-y-8">
+                        <div class="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 hover:shadow-2xl transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-white mb-4">Connection Events</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                    <code class="text-blue-400">connected</code>
+                                    <span class="text-gray-300">When successfully connected</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                    <code class="text-blue-400">error</code>
+                                    <span class="text-gray-300">On connection error</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <code class="text-blue-400">disconnected</code>
+                                    <span class="text-gray-300">When connection is lost</span>
+                                </div>
                             </div>
-                            <code><span class="code-comment">// Advanced schema with validations</span>
-<span class="code-keyword">const</span> productSchema = {
-  <span class="code-property">name</span>: { 
-    <span class="code-property">type</span>: <span class="code-string">'string'</span>, 
-    <span class="code-property">required</span>: <span class="code-keyword">true</span>,
-    <span class="code-property">minlength</span>: [<span class="code-number">3</span>, <span class="code-string">'Name must be at least 3 characters'</span>],
-    <span class="code-property">maxlength</span>: [<span class="code-number">50</span>, <span class="code-string">'Name cannot exceed 50 characters'</span>]
-  },
-  
-  <span class="code-property">price</span>: { 
-    <span class="code-property">type</span>: <span class="code-string">'number'</span>, 
-    <span class="code-property">required</span>: <span class="code-keyword">true</span>,
-    <span class="code-property">min</span>: [<span class="code-number">0</span>, <span class="code-string">'Price cannot be negative'</span>]
-  },
-  
-  <span class="code-property">category</span>: {
-    <span class="code-property">type</span>: <span class="code-string">'string'</span>,
-    <span class="code-property">enum</span>: [<span class="code-string">'Electronics'</span>, <span class="code-string">'Clothing'</span>, <span class="code-string">'Books'</span>],
-    <span class="code-property">default</span>: <span class="code-string">'Electronics'</span>
-  },
-  
-  <span class="code-property">inStock</span>: { 
-    <span class="code-property">type</span>: <span class="code-string">'boolean'</span>, 
-    <span class="code-property">default</span>: <span class="code-keyword">true</span> 
-  }
-};</code>
                         </div>
-                    </div>
-                    
-                    <div id="schema-shortcuts" class="tab-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Shortcut</th>
-                                    <th>Description</th>
-                                    <th>Equivalent To</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><code>'string!'</code></td>
-                                    <td>Required string</td>
-                                    <td><code>{ type: String, required: true }</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>'number?'</code></td>
-                                    <td>Optional number</td>
-                                    <td><code>Number</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>'boolean+'</code></td>
-                                    <td>Boolean with default false</td>
-                                    <td><code>{ type: Boolean, default: false }</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>'email'</code></td>
-                                    <td>Email with validation</td>
-                                    <td><code>{ type: String, required: true, match: emailRegex }</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>'password'</code></td>
-                                    <td>Password with min length</td>
-                                    <td><code>{ type: String, required: true, minlength: 6 }</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>'url'</code></td>
-                                    <td>URL with validation</td>
-                                    <td><code>{ type: String, match: urlRegex }</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>'userRef'</code></td>
-                                    <td>Reference to User model</td>
-                                    <td><code>{ type: ObjectId, ref: 'User' }</code></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Models -->
-        <section id="models" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-cube"></i> Models</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Create models with automatic features and enhancements:</p>
-                    
-                    <div class="code-block">
-                        <div class="code-header">
-                            <div class="code-title">JavaScript</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        </div>
-                        <code><span class="code-comment">// Create a model</span>
-<span class="code-keyword">const</span> User = mongoo.model(<span class="code-string">'User'</span>, {
-  <span class="code-property">firstName</span>: <span class="code-string">'string!'</span>,
-  <span class="code-property">lastName</span>: <span class="code-string">'string!'</span>,
-  <span class="code-property">email</span>: <span class="code-string">'email'</span>,
-  <span class="code-property">birthDate</span>: <span class="code-string">'date?'</span>
-});
-
-<span class="code-comment">// Get existing model</span>
-<span class="code-keyword">const</span> User = mongoo.getModel(<span class="code-string">'User'</span>);
-
-<span class="code-comment">// Use predefined template</span>
-<span class="code-keyword">const</span> User = mongoo.model(<span class="code-string">'User'</span>, mongoo.templates.user);</code>
-                    </div>
-                    
-                    <h4>Auto-Features Included:</h4>
-                    <ul>
-                        <li><strong>Timestamps:</strong> Automatic createdAt and updatedAt fields</li>
-                        <li><strong>Indexes:</strong> Auto-indexing for common fields</li>
-                        <li><strong>Virtuals:</strong> Automatic virtual fields (fullName, age, etc.)</li>
-                        <li><strong>Middleware:</strong> Auto-hooks for common operations</li>
-                        <li><strong>Validation:</strong> Smart validation with friendly messages</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- CRUD Operations -->
-        <section id="crud" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-tasks"></i> CRUD Operations</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Complete CRUD operations with simplified syntax:</p>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="openTab(event, 'crud-create')">Create</div>
-                        <div class="tab" onclick="openTab(event, 'crud-read')">Read</div>
-                        <div class="tab" onclick="openTab(event, 'crud-update')">Update</div>
-                        <div class="tab" onclick="openTab(event, 'crud-delete')">Delete</div>
-                    </div>
-                    
-                    <div id="crud-create" class="tab-content active">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <div class="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 hover:shadow-2xl transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-white mb-4">Environment Setup</h3>
+                            <div class="code-box">
+                                <div class="code-content">
+                                    <pre><code>// Using environment variables
+await mongoo.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});</code></pre>
+                                </div>
                             </div>
-                            <code><span class="code-comment">// Create a single document</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
-  <span class="code-property">name</span>: <span class="code-string">'Alice'</span>,
-  <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span>,
-  <span class="code-property">age</span>: <span class="code-number">28</span>
-});
-
-<span class="code-comment">// Create multiple documents</span>
-<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> User.create([
-  { <span class="code-property">name</span>: <span class="code-string">'Bob'</span>, <span class="code-property">email</span>: <span class="code-string">'bob@example.com'</span> },
-  { <span class="code-property">name</span>: <span class="code-string">'Charlie'</span>, <span class="code-property">email</span>: <span class="code-string">'charlie@example.com'</span> }
-]);
-
-<span class="code-comment">// Find or create</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findOrCreate(<span class="code-string">'User'</span>, 
-  { <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span> },
-  { <span class="code-property">name</span>: <span class="code-string">'Alice'</span>, <span class="code-property">age</span>: <span class="code-number">28</span> }
-);</code>
-                        </div>
-                    </div>
-                    
-                    <div id="crud-read" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Find all documents</span>
-<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>);
-
-<span class="code-comment">// Find with filter</span>
-<span class="code-keyword">const</span> activeUsers = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>, { 
-  <span class="code-property">isActive</span>: <span class="code-keyword">true</span>,
-  <span class="code-property">age</span>: { <span class="code-operator">$gte</span>: <span class="code-number">18</span> }
-});
-
-<span class="code-comment">// Find one document</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findOne(<span class="code-string">'User'</span>, { 
-  <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span> 
-});
-
-<span class="code-comment">// Find by ID</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'507f1f77bcf86cd799439011'</span>);
-
-<span class="code-comment">// Find with options</span>
-<span class="code-keyword">const</span> users = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>, {}, {
-  <span class="code-property">sort</span>: { <span class="code-property">createdAt</span>: -<span class="code-number">1</span> },
-  <span class="code-property">limit</span>: <span class="code-number">10</span>,
-  <span class="code-property">select</span>: <span class="code-string">'name email'</span>,
-  <span class="code-property">populate</span>: <span class="code-string">'posts'</span>
-});</code>
-                        </div>
-                    </div>
-                    
-                    <div id="crud-update" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Update multiple documents</span>
-<span class="code-keyword">await</span> mongoo.update(<span class="code-string">'User'</span>, 
-  { <span class="code-property">isActive</span>: <span class="code-keyword">false</span> }, 
-  { <span class="code-property">status</span>: <span class="code-string">'inactive'</span> }
-);
-
-<span class="code-comment">// Update by ID</span>
-<span class="code-keyword">const</span> updatedUser = <span class="code-keyword">await</span> mongoo.updateById(
-  <span class="code-string">'User'</span>, 
-  <span class="code-string">'507f1f77bcf86cd799439011'</span>,
-  { <span class="code-property">age</span>: <span class="code-number">29</span>, <span class="code-property">lastLogin</span>: <span class="code-keyword">new</span> Date() }
-);
-
-<span class="code-comment">// Save (create or update)</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.save(<span class="code-string">'User'</span>, {
-  <span class="code-property">_id</span>: <span class="code-string">'507f1f77bcf86cd799439011'</span>, <span class="code-comment">// If provided, updates existing</span>
-  <span class="code-property">name</span>: <span class="code-string">'Alice Updated'</span>,
-  <span class="code-property">email</span>: <span class="code-string">'alice.updated@example.com'</span>
-});</code>
-                        </div>
-                    </div>
-                    
-                    <div id="crud-delete" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Delete multiple documents</span>
-<span class="code-keyword">await</span> mongoo.delete(<span class="code-string">'User'</span>, { 
-  <span class="code-property">isActive</span>: <span class="code-keyword">false</span> 
-});
-
-<span class="code-comment">// Delete by ID</span>
-<span class="code-keyword">await</span> mongoo.deleteById(<span class="code-string">'User'</span>, <span class="code-string">'507f1f77bcf86cd799439011'</span>);
-
-<span class="code-comment">// Check if document exists</span>
-<span class="code-keyword">const</span> exists = <span class="code-keyword">await</span> mongoo.exists(<span class="code-string">'User'</span>, { 
-  <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span> 
-});
-
-<span class="code-comment">// Count documents</span>
-<span class="code-keyword">const</span> count = <span class="code-keyword">await</span> mongoo.count(<span class="code-string">'User'</span>, { 
-  <span class="code-property">isActive</span>: <span class="code-keyword">true</span> 
-});</code>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Virtual Fields -->
-        <section id="virtuals" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-ghost"></i> Virtual Fields <span class="feature-badge">NEW</span></h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Virtual fields are computed properties that don't get stored in MongoDB:</p>
-                    
-                    <div class="code-block">
-                        <div class="code-header">
-                            <div class="code-title">JavaScript</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <!-- Footer -->
+        <footer class="bg-gray-950 text-white py-12 border-t border-gray-800">
+            <div class="container mx-auto px-4 max-w-full">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Easy-Mongoo</h3>
+                        <p class="text-gray-400 text-sm">
+                            Ultra-simple MongoDB wrapper for Node.js
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Resources</h4>
+                        <div class="space-y-2">
+                            <a href="https://github.com/easy-mongoo" class="block text-gray-400 hover:text-white transition-colors text-sm">GitHub Repository</a>
+                            <a href="#api" class="block text-gray-400 hover:text-white transition-colors text-sm">API Documentation</a>
+                            <a href="#examples" class="block text-gray-400 hover:text-white transition-colors text-sm">Examples</a>
                         </div>
-                        <code><span class="code-comment">// Auto virtuals (already included)</span>
-<span class="code-comment">// - fullName (if firstName and lastName exist)</span>
-<span class="code-comment">// - age (if birthDate exists)</span>
-<span class="code-comment">// - createdAtFormatted</span>
-
-<span class="code-comment">// Custom virtual field</span>
-mongoo.virtual(<span class="code-string">'User'</span>, <span class="code-string">'profileUrl'</span>, <span class="code-keyword">function</span>() {
-  <span class="code-keyword">return</span> <span class="code-string">`/users/</span><span class="code-function">${</span><span class="code-keyword">this</span>.slug <span class="code-operator">||</span> <span class="code-keyword">this</span>._id<span class="code-function">}</span><span class="code-string">`</span>;
-});
-
-<span class="code-comment">// Virtual with setter</span>
-mongoo.virtual(<span class="code-string">'User'</span>, <span class="code-string">'fullName'</span>, 
-  <span class="code-comment">// Getter</span>
-  <span class="code-keyword">function</span>() {
-    <span class="code-keyword">return</span> <span class="code-string">`</span><span class="code-function">${</span><span class="code-keyword">this</span>.firstName<span class="code-function">}</span><span class="code-string"> </span><span class="code-function">${</span><span class="code-keyword">this</span>.lastName<span class="code-function">}</span><span class="code-string">`</span>;
-  },
-  <span class="code-comment">// Setter</span>
-  <span class="code-keyword">function</span>(value) {
-    <span class="code-keyword">const</span> parts = value.split(<span class="code-string">' '</span>);
-    <span class="code-keyword">this</span>.firstName = parts[<span class="code-number">0</span>];
-    <span class="code-keyword">this</span>.lastName = parts.slice(<span class="code-number">1</span>).join(<span class="code-string">' '</span>);
-  }
-);
-
-<span class="code-comment">// Usage</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'...'</span>);
-<span class="code-function">console</span>.log(user.fullName); <span class="code-comment">// Computed property</span>
-<span class="code-function">console</span>.log(user.profileUrl); <span class="code-comment">// Custom virtual</span></code>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Support</h4>
+                        <div class="space-y-2">
+                            <a href="https://github.com/easy-mongoo/issues" class="block text-gray-400 hover:text-white transition-colors text-sm">Issue Tracker</a>
+                            <a href="https://github.com/easy-mongoo/discussions" class="block text-gray-400 hover:text-white transition-colors text-sm">Discussions</a>
+                            <span class="block text-gray-400 text-sm">Email: support@easy-mongoo.dev</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">License</h4>
+                        <p class="text-gray-400 text-sm">MIT License • Built with Node.js & MongoDB</p>
+                        <p class="text-gray-400 text-sm mt-2">© 2024 Easy-Mongoo. All rights reserved.</p>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Methods & Statics -->
-        <section id="methods" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-cog"></i> Methods & Statics</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Add custom instance methods and static methods to your models:</p>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="openTab(event, 'methods-instance')">Instance Methods</div>
-                        <div class="tab" onclick="openTab(event, 'methods-static')">Static Methods</div>
-                        <div class="tab" onclick="openTab(event, 'methods-query')">Query Helpers</div>
-                    </div>
-                    
-                    <div id="methods-instance" class="tab-content active">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Add instance method</span>
-mongoo.method(<span class="code-string">'User'</span>, <span class="code-string">'getProfile'</span>, <span class="code-keyword">function</span>() {
-  <span class="code-keyword">return</span> {
-    <span class="code-property">name</span>: <span class="code-keyword">this</span>.name,
-    <span class="code-property">email</span>: <span class="code-keyword">this</span>.email,
-    <span class="code-property">memberSince</span>: <span class="code-keyword">this</span>.createdAt,
-    <span class="code-property">profileUrl</span>: <span class="code-string">`/users/</span><span class="code-function">${</span><span class="code-keyword">this</span>._id<span class="code-function">}</span><span class="code-string">`</span>
-  };
-});
-
-<span class="code-comment">// Instance method with async operations</span>
-mongoo.method(<span class="code-string">'User'</span>, <span class="code-string">'deactivate'</span>, <span class="code-keyword">async function</span>(reason) {
-  <span class="code-keyword">this</span>.isActive = <span class="code-keyword">false</span>;
-  <span class="code-keyword">this</span>.deactivationReason = reason;
-  <span class="code-keyword">this</span>.deactivatedAt = <span class="code-keyword">new</span> Date();
-  <span class="code-keyword">return await</span> <span class="code-keyword">this</span>.save();
-});
-
-<span class="code-comment">// Usage</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.findById(<span class="code-string">'User'</span>, <span class="code-string">'...'</span>);
-<span class="code-keyword">const</span> profile = user.getProfile();
-<span class="code-keyword">await</span> user.deactivate(<span class="code-string">'User requested'</span>);</code>
-                        </div>
-                    </div>
-                    
-                    <div id="methods-static" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Add static method</span>
-mongoo.static(<span class="code-string">'User'</span>, <span class="code-string">'findByEmail'</span>, <span class="code-keyword">async function</span>(email) {
-  <span class="code-keyword">return await</span> <span class="code-keyword">this</span>.findOne({ email }).populate(<span class="code-string">'posts'</span>);
-});
-
-<span class="code-comment">// Static method with complex logic</span>
-mongoo.static(<span class="code-string">'User'</span>, <span class="code-string">'getActiveStats'</span>, <span class="code-keyword">async function</span>() {
-  <span class="code-keyword">const</span> stats = <span class="code-keyword">await</span> <span class="code-keyword">this</span>.aggregate([
-    { <span class="code-property">$match</span>: { <span class="code-property">isActive</span>: <span class="code-keyword">true</span> } },
-    { <span class="code-property">$group</span>: {
-        <span class="code-property">_id</span>: <span class="code-keyword">null</span>,
-        <span class="code-property">total</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> },
-        <span class="code-property">avgAge</span>: { <span class="code-property">$avg</span>: <span class="code-string">'$age'</span> },
-        <span class="code-property">maxAge</span>: { <span class="code-property">$max</span>: <span class="code-string">'$age'</span> },
-        <span class="code-property">minAge</span>: { <span class="code-property">$min</span>: <span class="code-string">'$age'</span> }
-    }}
-  ]);
-  <span class="code-keyword">return</span> stats[<span class="code-number">0</span>] <span class="code-operator">||</span> {};
-});
-
-<span class="code-comment">// Usage</span>
-<span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.getModel(<span class="code-string">'User'</span>).findByEmail(<span class="code-string">'alice@example.com'</span>);
-<span class="code-keyword">const</span> stats = <span class="code-keyword">await</span> mongoo.getModel(<span class="code-string">'User'</span>).getActiveStats();</code>
-                        </div>
-                    </div>
-                    
-                    <div id="methods-query" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Add query helper</span>
-mongoo.query(<span class="code-string">'User'</span>, <span class="code-string">'byAgeRange'</span>, <span class="code-keyword">function</span>(min, max) {
-  <span class="code-keyword">return</span> <span class="code-keyword">this</span>.where(<span class="code-string">'age'</span>).gte(min).lte(max);
-});
-
-<span class="code-comment">// Query helper for text search</span>
-mongoo.query(<span class="code-string">'User'</span>, <span class="code-string">'search'</span>, <span class="code-keyword">function</span>(text) {
-  <span class="code-keyword">return</span> <span class="code-keyword">this</span>.find({
-    <span class="code-property">$or</span>: [
-      { <span class="code-property">name</span>: { <span class="code-property">$regex</span>: text, <span class="code-property">$options</span>: <span class="code-string">'i'</span> } },
-      { <span class="code-property">email</span>: { <span class="code-property">$regex</span>: text, <span class="code-property">$options</span>: <span class="code-string">'i'</span> } }
-    ]
-  });
-});
-
-<span class="code-comment">// Usage</span>
-<span class="code-keyword">const</span> adults = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>).byAgeRange(<span class="code-number">18</span>, <span class="code-number">65</span>);
-<span class="code-keyword">const</span> searchResults = <span class="code-keyword">await</span> mongoo.find(<span class="code-string">'User'</span>).search(<span class="code-string">'alice'</span>);</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Middleware -->
-        <section id="middleware" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-code-branch"></i> Middleware (Hooks)</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Middleware (hooks) allow you to execute functions before or after certain operations:</p>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="openTab(event, 'middleware-pre')">Pre Hooks</div>
-                        <div class="tab" onclick="openTab(event, 'middleware-post')">Post Hooks</div>
-                        <div class="tab" onclick="openTab(event, 'middleware-aggregate')">Aggregate Hooks</div>
-                    </div>
-                    
-                    <div id="middleware-pre" class="tab-content active">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Pre-save hook</span>
-mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'save'</span>, <span class="code-keyword">async function</span>(next) {
-  <span class="code-keyword">if</span> (<span class="code-keyword">this</span>.isModified(<span class="code-string">'password'</span>)) {
-    <span class="code-keyword">this</span>.password = <span class="code-keyword">await</span> bcrypt.hash(<span class="code-keyword">this</span>.password, <span class="code-number">12</span>);
-  }
-  next();
-});
-
-<span class="code-comment">// Pre-remove hook</span>
-mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'remove'</span>, <span class="code-keyword">async function</span>(next) {
-  <span class="code-comment">// Remove user's posts when user is deleted</span>
-  <span class="code-keyword">await</span> mongoo.delete(<span class="code-string">'Post'</span>, { <span class="code-property">author</span>: <span class="code-keyword">this</span>._id });
-  next();
-});
-
-<span class="code-comment">// Pre-find hook</span>
-mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'find'</span>, <span class="code-keyword">function</span>(next) {
-  <span class="code-comment">// Only find active users by default</span>
-  <span class="code-keyword">this</span>.where({ <span class="code-property">isActive</span>: <span class="code-keyword">true</span> });
-  next();
-});</code>
-                        </div>
-                    </div>
-                    
-                    <div id="middleware-post" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Post-save hook</span>
-mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'save'</span>, <span class="code-keyword">function</span>(doc) {
-  <span class="code-function">console</span>.log(<span class="code-string">`User </span><span class="code-function">${</span>doc.name<span class="code-function">}</span><span class="code-string"> was saved`</span>);
-});
-
-<span class="code-comment">// Post-remove hook</span>
-mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'remove'</span>, <span class="code-keyword">function</span>(doc) {
-  <span class="code-function">console</span>.log(<span class="code-string">`User </span><span class="code-function">${</span>doc.name<span class="code-function">}</span><span class="code-string"> was removed`</span>);
-});
-
-<span class="code-comment">// Post-find hook</span>
-mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'find'</span>, <span class="code-keyword">function</span>(docs) {
-  <span class="code-function">console</span>.log(<span class="code-string">`Found </span><span class="code-function">${</span>docs.length<span class="code-function">}</span><span class="code-string"> users`</span>);
-});</code>
-                        </div>
-                    </div>
-                    
-                    <div id="middleware-aggregate" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Pre-aggregate hook</span>
-mongoo.pre(<span class="code-string">'User'</span>, <span class="code-string">'aggregate'</span>, <span class="code-keyword">function</span>(next) {
-  <span class="code-comment">// Add match stage to exclude deleted users</span>
-  <span class="code-keyword">this</span>.pipeline().unshift({
-    <span class="code-property">$match</span>: { <span class="code-property">isActive</span>: <span class="code-keyword">true</span> }
-  });
-  next();
-});
-
-<span class="code-comment">// Post-aggregate hook</span>
-mongoo.post(<span class="code-string">'User'</span>, <span class="code-string">'aggregate'</span>, <span class="code-keyword">function</span>(docs) {
-  <span class="code-function">console</span>.log(<span class="code-string">`Aggregation returned </span><span class="code-function">${</span>docs.length<span class="code-function">}</span><span class="code-string"> documents`</span>);
-});</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Transactions -->
-        <section id="transactions" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-exchange-alt"></i> Transactions</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Execute multiple operations as a single atomic transaction:</p>
-                    
-                    <div class="code-block">
-                        <div class="code-header">
-                            <div class="code-title">JavaScript</div>
-                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        </div>
-                        <code><span class="code-comment">// Basic transaction</span>
-<span class="code-keyword">await</span> mongoo.withTransaction(<span class="code-keyword">async</span> (session) => {
-  <span class="code-comment">// Create user</span>
-  <span class="code-keyword">const</span> user = <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, {
-    <span class="code-property">name</span>: <span class="code-string">'Alice'</span>,
-    <span class="code-property">email</span>: <span class="code-string">'alice@example.com'</span>
-  }, { session });
-
-  <span class="code-comment">// Create user's first post</span>
-  <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'Post'</span>, {
-    <span class="code-property">title</span>: <span class="code-string">'First Post'</span>,
-    <span class="code-property">content</span>: <span class="code-string">'Hello World!'</span>,
-    <span class="code-property">author</span>: user._id
-  }, { session });
-});
-
-<span class="code-comment">// Transaction with retry logic</span>
-<span class="code-keyword">await</span> mongoo.withRetryTransaction(<span class="code-keyword">async</span> (session) => {
-  <span class="code-comment">// Transfer money between accounts</span>
-  <span class="code-keyword">await</span> mongoo.update(
-    <span class="code-string">'Account'</span>,
-    { <span class="code-property">_id</span>: <span class="code-string">'fromAccountId'</span>, <span class="code-property">balance</span>: { <span class="code-property">$gte</span>: <span class="code-number">100</span> } },
-    { <span class="code-property">$inc</span>: { <span class="code-property">balance</span>: -<span class="code-number">100</span> } },
-    { session }
-  );
-
-  <span class="code-keyword">await</span> mongoo.update(
-    <span class="code-string">'Account'</span>,
-    { <span class="code-property">_id</span>: <span class="code-string">'toAccountId'</span> },
-    { <span class="code-property">$inc</span>: { <span class="code-property">balance</span>: <span class="code-number">100</span> } },
-    { session }
-  );
-}, <span class="code-number">3</span>); <span class="code-comment">// Retry up to 3 times</span>
-
-<span class="code-comment">// Manual session management</span>
-<span class="code-keyword">const</span> session = <span class="code-keyword">await</span> mongoo.startSession();
-<span class="code-keyword">try</span> {
-  session.startTransaction();
-  
-  <span class="code-comment">// Your operations here</span>
-  <span class="code-keyword">await</span> mongoo.create(<span class="code-string">'User'</span>, userData, { session });
-  
-  <span class="code-keyword">await</span> session.commitTransaction();
-} <span class="code-keyword">catch</span> (error) {
-  <span class="code-keyword">await</span> session.abortTransaction();
-  <span class="code-keyword">throw</span> error;
-} <span class="code-keyword">finally</span> {
-  session.endSession();
-}</code>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Aggregation -->
-        <section id="aggregation" class="section">
-            <div class="section-header">
-                <h2><i class="fas fa-chart-bar"></i> Aggregation</h2>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <p>Perform complex data analysis with MongoDB aggregation pipeline:</p>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="openTab(event, 'aggregation-basic')">Basic Aggregation</div>
-                        <div class="tab" onclick="openTab(event, 'aggregation-advanced')">Advanced Pipeline</div>
-                        <div class="tab" onclick="openTab(event, 'aggregation-facets')">Facets & Multiple</div>
-                    </div>
-                    
-                    <div id="aggregation-basic" class="tab-content active">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Basic aggregation - group by category</span>
-<span class="code-keyword">const</span> categoryStats = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Product'</span>, [
-  {
-    <span class="code-property">$group</span>: {
-      <span class="code-property">_id</span>: <span class="code-string">'$category'</span>,
-      <span class="code-property">totalProducts</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> },
-      <span class="code-property">avgPrice</span>: { <span class="code-property">$avg</span>: <span class="code-string">'$price'</span> },
-      <span class="code-property">maxPrice</span>: { <span class="code-property">$max</span>: <span class="code-string">'$price'</span> },
-      <span class="code-property">minPrice</span>: { <span class="code-property">$min</span>: <span class="code-string">'$price'</span> }
-    }
-  },
-  {
-    <span class="code-property">$sort</span>: { <span class="code-property">totalProducts</span>: -<span class="code-number">1</span> }
-  }
-]);
-
-<span class="code-comment">// Lookup aggregation (join collections)</span>
-<span class="code-keyword">const</span> userOrders = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Order'</span>, [
-  {
-    <span class="code-property">$lookup</span>: {
-      <span class="code-property">from</span>: <span class="code-string">'users'</span>,
-      <span class="code-property">localField</span>: <span class="code-string">'customer'</span>,
-      <span class="code-property">foreignField</span>: <span class="code-string">'_id'</span>,
-      <span class="code-property">as</span>: <span class="code-string">'customerInfo'</span>
-    }
-  },
-  {
-    <span class="code-property">$unwind</span>: <span class="code-string">'$customerInfo'</span>
-  },
-  {
-    <span class="code-property">$project</span>: {
-      <span class="code-property">orderNumber</span>: <span class="code-number">1</span>,
-      <span class="code-property">total</span>: <span class="code-number">1</span>,
-      <span class="code-property">customerName</span>: <span class="code-string">'$customerInfo.name'</span>,
-      <span class="code-property">customerEmail</span>: <span class="code-string">'$customerInfo.email'</span>
-    }
-  }
-]);</code>
-                        </div>
-                    </div>
-                    
-                    <div id="aggregation-advanced" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Advanced aggregation with multiple stages</span>
-<span class="code-keyword">const</span> salesReport = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Order'</span>, [
-  <span class="code-comment">// Match orders from last 30 days</span>
-  {
-    <span class="code-property">$match</span>: {
-      <span class="code-property">createdAt</span>: {
-        <span class="code-property">$gte</span>: <span class="code-keyword">new</span> Date(Date.now() - <span class="code-number">30</span> * <span class="code-number">24</span> * <span class="code-number">60</span> * <span class="code-number">60</span> * <span class="code-number">1000</span>)
-      },
-      <span class="code-property">status</span>: <span class="code-string">'completed'</span>
-    }
-  },
-  <span class="code-comment">// Unwind items array</span>
-  {
-    <span class="code-property">$unwind</span>: <span class="code-string">'$items'</span>
-  },
-  <span class="code-comment">// Lookup product details</span>
-  {
-    <span class="code-property">$lookup</span>: {
-      <span class="code-property">from</span>: <span class="code-string">'products'</span>,
-      <span class="code-property">localField</span>: <span class="code-string">'items.product'</span>,
-      <span class="code-property">foreignField</span>: <span class="code-string">'_id'</span>,
-      <span class="code-property">as</span>: <span class="code-string">'productInfo'</span>
-    }
-  },
-  <span class="code-comment">// Unwind product info</span>
-  {
-    <span class="code-property">$unwind</span>: <span class="code-string">'$productInfo'</span>
-  },
-  <span class="code-comment">// Group by product category</span>
-  {
-    <span class="code-property">$group</span>: {
-      <span class="code-property">_id</span>: <span class="code-string">'$productInfo.category'</span>,
-      <span class="code-property">totalRevenue</span>: { <span class="code-property">$sum</span>: <span class="code-string">'$items.total'</span> },
-      <span class="code-property">totalUnits</span>: { <span class="code-property">$sum</span>: <span class="code-string">'$items.quantity'</span> },
-      <span class="code-property">avgOrderValue</span>: { <span class="code-property">$avg</span>: <span class="code-string">'$total'</span> }
-    }
-  },
-  <span class="code-comment">// Sort by revenue</span>
-  {
-    <span class="code-property">$sort</span>: { <span class="code-property">totalRevenue</span>: -<span class="code-number">1</span> }
-  }
-]);</code>
-                        </div>
-                    </div>
-                    
-                    <div id="aggregation-facets" class="tab-content">
-                        <div class="code-block">
-                            <div class="code-header">
-                                <div class="code-title">JavaScript</div>
-                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            </div>
-                            <code><span class="code-comment">// Faceted search with multiple aggregations</span>
-<span class="code-keyword">const</span> facetedResults = <span class="code-keyword">await</span> mongoo.aggregate(<span class="code-string">'Product'</span>, [
-  {
-    <span class="code-property">$match</span>: {
-      <span class="code-property">price</span>: { <span class="code-property">$lte</span>: <span class="code-number">1000</span> },
-      <span class="code-property">isActive</span>: <span class="code-keyword">true</span>
-    }
-  },
-  {
-    <span class="code-property">$facet</span>: {
-      <span class="code-comment">// Price ranges</span>
-      <span class="code-property">priceRanges</span>: [
-        {
-          <span class="code-property">$bucket</span>: {
-            <span class="code-property">groupBy</span>: <span class="code-string">'$price'</span>,
-            <span class="code-property">boundaries</span>: [<span class="code-number">0</span>, <span class="code-number">50</span>, <span class="code-number">100</span>, <span class="code-number">200</span>, <span class="code-number">500</span>, <span class="code-number">1000</span>],
-            <span class="code-property">default</span>: <span class="code-string">'Other'</span>,
-            <span class="code-property">output</span>: {
-              <span class="code-property">count</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> },
-              <span class="code-property">products</span>: { <span class="code-property">$push</span>: <span class="code-string">'$name'</span> }
-            }
-          }
-        }
-      ],
-      <span class="code-comment">// Categories</span>
-      <span class="code-property">categories</span>: [
-        {
-          <span class="code-property">$group</span>: {
-            <span class="code-property">_id</span>: <span class="code-string">'$category'</span>,
-            <span class="code-property">count</span>: { <span class="code-property">$sum</span>: <span class="code-number">1</span> }
-          }
-        },
-        { <span class="code-property">$sort</span>: { <span class="code-property">count</span>: -<span class="code-number">1</span> } },
-        { <span class="code-property">$limit</span>: <span class="code-number">10</span> }
-      ],
-      <span class="code-comment">// Total count</span>
-      <span class="code-property">totalCount</span>: [
-        { <span class="code-property">$count</span>: <span class="code-string">'count'</span> }
-      ]
-    }
-  }
-]);</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Continue with other sections... -->
-
-        <!-- Schema Designer Button -->
-        <a href="/schema-design.html" class="schema-designer-btn">
-            <i class="fas fa-palette"></i>
-            <span>New</span>
-        </a>
+        </footer>
     </div>
 
+    <!-- Schema Designer Button -->
+    <a href="/schema-design.html" class="fixed bottom-8 right-8 bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 z-30">
+        <i class="fas fa-palette text-xl"></i>
+    </a>
+
+    <!-- JavaScript -->
     <script>
         // Mobile menu toggle
         document.getElementById('mobileMenuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         });
 
-        // Copy code functionality
-        function copyCode(button) {
-            const codeBlock = button.parentElement.nextElementSibling;
-            const textArea = document.createElement('textarea');
-            textArea.value = codeBlock.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // Visual feedback
-            const originalText = button.textContent;
-            button.textContent = 'Copied!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 2000);
-        }
+        // Close sidebar when clicking on overlay
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('active');
+            this.classList.remove('active');
+        });
 
-        // Tab functionality
-        function openTab(evt, tabName) {
-            const tabcontent = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove('active');
-            }
-            
-            const tablinks = document.getElementsByClassName('tab');
-            for (let i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove('active');
-            }
-            
-            document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.classList.add('active');
-        }
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    document.getElementById('sidebar').classList.remove('active');
+                    document.getElementById('sidebarOverlay').classList.remove('active');
+                }
+            });
+        });
 
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 20,
-                        behavior: 'smooth'
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
                     });
-                    
-                    // Close mobile menu if open
-                    document.getElementById('sidebar').classList.remove('active');
                 }
             });
         });
 
-        // Update active nav link on scroll
-        window.addEventListener('scroll', function() {
-            const sections = document.querySelectorAll('.section');
-            const navLinks = document.querySelectorAll('.nav-links a');
-            
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (pageYOffset >= sectionTop - 100) {
-                    current = section.getAttribute('id');
-                }
-            });
-            
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${current}`) {
-                    link.classList.add('active');
-                }
+        // Copy code functionality
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-box').querySelector('code');
+                const textToCopy = codeBlock.textContent || codeBlock.innerText;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
             });
         });
 
-        // SEO: Track page views (simplified)
-        if (typeof gtag !== 'undefined') {
-            gtag('config', 'GA_MEASUREMENT_ID', {
-                page_title: 'Easy-Mongoo Documentation',
-                page_location: window.location.href
-            });
-        }
+        // Close sidebar when window is resized to desktop size
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
